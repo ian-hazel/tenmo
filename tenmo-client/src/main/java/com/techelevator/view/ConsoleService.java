@@ -73,4 +73,8 @@ public class ConsoleService {
 		} while(result == null);
 		return result;
 	}
+	
+	public void printGoodBye() {
+		System.out.println("Have a nice day!");
+	}
 }
