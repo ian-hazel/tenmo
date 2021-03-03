@@ -93,6 +93,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 	
 	private void exitProgram() {
+		System.out.println("Have a nice day!");
 		System.exit(0);
 	}
 
