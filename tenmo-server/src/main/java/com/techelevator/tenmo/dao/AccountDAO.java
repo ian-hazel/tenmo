@@ -1,11 +1,12 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.model.Account;
+import java.math.BigDecimal;
+import java.security.Principal;
 
 public interface AccountDAO {
 
-	double getBalanceById(Long accountId);
+	BigDecimal getBalance(Principal principal);
 	
-	void setBalanceById(Long accountId, double balance);
+	void setBalance(Principal principal, BigDecimal balance);
 		
 }

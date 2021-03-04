@@ -21,7 +21,7 @@ import com.techelevator.tenmo.dao.UserDAO;
 import com.techelevator.tenmo.model.LoginDTO;
 import com.techelevator.tenmo.model.RegisterUserDTO;
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserAlreadyExistsException;
+import com.techelevator.tenmo.model.exceptions.UserAlreadyExistsException;
 import com.techelevator.tenmo.security.jwt.JWTFilter;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 
