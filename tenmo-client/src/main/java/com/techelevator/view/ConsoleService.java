@@ -74,7 +74,17 @@ public class ConsoleService {
 		return result;
 	}
 	
+	public void printHeader() {
+		System.out.println("*********************");
+		System.out.println("* Welcome to TEnmo! *");
+		System.out.println("*********************");
+	}
+	
 	public void printGoodBye() {
 		System.out.println("Have a nice day!");
+	}
+	
+	public void message(String message) {
+		System.out.println(message);
 	}
 }
