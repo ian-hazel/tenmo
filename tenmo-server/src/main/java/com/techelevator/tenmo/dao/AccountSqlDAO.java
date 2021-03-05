@@ -27,12 +27,4 @@ public class AccountSqlDAO implements AccountDAO {
 		jdbcTemplate.update(sqlUpdateBalance, balance, principal.getName());
 	}
 	
-//	private Account mapRowToAccount(SqlRowSet rs) {
-//		Account account = new Account();
-//		account.setAccountId(rs.getLong("account_id"));
-//		account.setUserId(rs.getLong("user_id"));
-//		account.setBalance(rs.getDouble("balance"));
-//		return account;
-//	} //end mapRowToAccount() if we ever need it
-
 }

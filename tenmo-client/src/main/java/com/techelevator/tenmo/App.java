@@ -75,23 +75,19 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
+//		console.message(transferService.getHistory());
 	}
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
+//		console.message(transferService.getRequests());	
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
+//		console.message(transferService.sendTransfer());	
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
+//		console.message(transferService.requestTransfer());
 	}
 	
 	private void exitProgram() {
