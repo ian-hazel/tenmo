@@ -9,15 +9,22 @@ public class Transfer {
 	private Long acctToId;
 	private BigDecimal amount;
 	
-	enum Type { REQUEST, SEND }
+	public enum Type { REQUEST, SEND }
 	private Type type;
 	
-	enum Status { PENDING, APPROVED, REJECTED }
+	public enum Status { PENDING, APPROVED, REJECTED }
 	private Status status;
 	
 	public Transfer() {
 		
 	}
+	/*
+	public Transfer(BigDecimal amount, Type type, Status status) {
+		this.amount = amount;
+		this.type = type;
+		this.status = status;
+	}
+	*/
 	
 	public Transfer(Long transferId, Long acctFromId, Long acctToId, BigDecimal amount, Type type, Status status) {
 		this.transferId = transferId;
@@ -59,7 +66,7 @@ public class Transfer {
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-
+	
 	public Type getType() {
 		return type;
 	}
