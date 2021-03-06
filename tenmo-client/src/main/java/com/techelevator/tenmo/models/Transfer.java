@@ -1,13 +1,15 @@
 package com.techelevator.tenmo.models;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 
 public class Transfer {
 
 	private Long transferId;
-	private Long acctFromId;
-	private Long acctToId;
+	private Long userFromId;
+	private Long userToId;
 	private BigDecimal amount;
+	private Principal principal;
 	
 	public enum Type { REQUEST, SEND }
 	private Type type;
@@ -26,10 +28,10 @@ public class Transfer {
 	}
 	*/
 	
-	public Transfer(Long transferId, Long acctFromId, Long acctToId, BigDecimal amount, Type type, Status status) {
+	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
 		this.transferId = transferId;
-		this.acctFromId = acctFromId;
-		this.acctToId = acctToId;
+		this.userFromId = userFromId;
+		this.userToId = userToId;
 		this.amount = amount;
 		this.type = type;
 		this.status = status;	
@@ -43,20 +45,20 @@ public class Transfer {
 		this.transferId = transferId;
 	}
 
-	public Long getAcctFromId() {
-		return acctFromId;
+	public Long getUserFromId() {
+		return userFromId;
 	}
 
-	public void setAcctFromId(Long acctFromId) {
-		this.acctFromId = acctFromId;
+	public void setUserFromId(Long userFromId) {
+		this.userFromId = userFromId;
 	}
 
-	public Long getAcctToId() {
-		return acctToId;
+	public Long getUserToId() {
+		return userToId;
 	}
 
-	public void setAcctToId(Long acctToId) {
-		this.acctToId = acctToId;
+	public void setUserToId(Long userToId) {
+		this.userToId = userToId;
 	}
 
 	public BigDecimal getAmount() {
@@ -81,6 +83,14 @@ public class Transfer {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public Principal getPrincipal() {
+		return principal;
+	}
+
+	public void setPrincipal(Principal principal) {
+		this.principal = principal;
 	}
 	
 }
