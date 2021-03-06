@@ -131,7 +131,7 @@ public class TransferService {
 		headers.setBearerAuth(user.getToken());
 		HttpEntity<Integer> entity = new HttpEntity<>(userChoice, headers);
 		
-		String url = BASE_URL + "requests/" + request.getTransferId();		
+		String url = BASE_URL + "requests?append=" + request.getTransferId();		
 		
 		try {
 			restTemplate.put(url, entity);
