@@ -6,7 +6,5 @@ import java.security.Principal;
 public interface AccountDAO {
 
 	BigDecimal getBalance(Principal principal);
-	
-	void setBalance(Principal principal, BigDecimal balance);
 		
 }
