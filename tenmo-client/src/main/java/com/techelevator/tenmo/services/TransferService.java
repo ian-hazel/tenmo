@@ -74,12 +74,12 @@ public class TransferService {
 		return null;
 	}
 	
-	public List<Transfer> getTransferHistory(Principal principal, AuthenticatedUser user) {
-		List<Transfer> transferHistory = null;
+	public Transfer[] getTransferHistory(Principal principal, AuthenticatedUser user) {
+		Transfer[] transferHistory = null;
 		String url = BASE_URL + "transfers/";
 		
 		try {
-			transferHistory = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), List.class).getBody();
+			transferHistory = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer[].class).getBody();
 		}
 		catch (RestClientResponseException ex) {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
@@ -105,17 +105,42 @@ public class TransferService {
 	 * @param user 
 	 * @return pendingRequests
 	 */
-	public List<Request> getPendingRequests(AuthenticatedUser user) {
-		List<Request> pendingRequests = null;
+	public Request[] getPendingRequests(AuthenticatedUser user) {
+		Request[] pendingRequests = null;
 		
 		try {
-        	pendingRequests = restTemplate.exchange(BASE_URL + "/requests", HttpMethod.GET, makeAuthEntity(user.getToken()), List.class).getBody();
+        	pendingRequests = restTemplate.exchange(BASE_URL + "requests/", HttpMethod.GET, makeAuthEntity(user.getToken()), Request[].class).getBody();
         } catch (RestClientResponseException ex) {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
         }
 		return pendingRequests;
 	}
 	
+	/**
+	 * Checks list of pending requests from database
+	 * @param user 
+	 * @return pendingRequests
+	 */
+	public Integer approveOrRejectRequest(Request request, int userChoice, AuthenticatedUser user, Principal principal) {
+		if (userChoice != 1 || userChoice != 2) {
+			return null;
+		}
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setBearerAuth(user.getToken());
+		HttpEntity<Integer> entity = new HttpEntity<>(userChoice, headers);
+		
+		String url = BASE_URL + "requests?append=" + request.getTransferId();		
+		
+		try {
+			restTemplate.put(url, entity);
+		}
+		catch (RestClientResponseException ex) {
+            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+		}		
+		return userChoice;
+	}
 	
 	
 	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, Principal principal) {

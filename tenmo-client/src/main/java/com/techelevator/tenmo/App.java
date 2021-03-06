@@ -88,7 +88,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		System.out.println("Transfers                                    ");
 		System.out.println("ID            From/To                  Amount");
 		System.out.println("---------------------------------------------");
-		List<Transfer> transfers = transferService.getTransferHistory(principal, currentUser);
+		Transfer[] transfers = transferService.getTransferHistory(principal, currentUser);
 		for (Transfer transfer : transfers) {
 		// TODO: get print line working, needs from/to definition and the transfer name
 			//	System.out.println(transfer.getTransferId() + "        " + transfer.getType()) + transfer.get "                   " + NumberFormat.getCurrencyInstance().format(transfer.getAmount());
@@ -97,6 +97,10 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 
 	private void viewPendingRequests() {
 		System.out.println(transferService.getPendingRequests(currentUser));
+	}
+	
+	private void approveOrRejectRequest() {
+		// TODO: case 9 in readme, pass int with 1 or 2, object, principal
 	}
 
 	private void sendBucks() {
