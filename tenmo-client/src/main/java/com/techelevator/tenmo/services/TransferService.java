@@ -2,9 +2,11 @@ package com.techelevator.tenmo.services;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 
 import com.techelevator.tenmo.models.Account;
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Request;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 
@@ -12,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,26 +28,6 @@ public class TransferService {
 	}
 	
 	/**
-	  * Returns the balance in BigDecimal from account table using
-	  * principal as the key
-	  *
-	  * @param accountId
-	  * @return balance
-	  */
-	/*
-	public BigDecimal getBalance(AuthenticatedUser user) {
-		BigDecimal balance = null;
-		try {
-       	balance = restTemplate
-                   .exchange(BASE_URL + "/balance", HttpMethod.GET, makeAuthEntity(user.getToken()), BigDecimal.class).getBody();
-       } catch (RestClientResponseException ex) {
-           System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
-       }
-       return balance;
-	}
-	*/
-	
-	/**
 	 * Creates a new send transfer to send money 
 	 * from one account to another
 	 * Type should be automatically set to SEND
@@ -53,24 +36,39 @@ public class TransferService {
 	 * @param user, amount, receivingAcct
 	 * @return new sent transfer
 	 */
-	public Transfer sendTransfer(AuthenticatedUser user, BigDecimal amount, Account receivingAcct) {
+	public Transfer sendTransfer(BigDecimal amount, Long userToId, Principal principal) {
+		// should this be void? --> if sent to server in try/catch, should go through/throw exception, no need for return
+		// TODO: send BigDecimal amount, Long userToId, Principal principal
 		//int sendingUserAcct = user.getUser().getId();
 		// TODO: need to get the authenticated user's acct
+		principal.getClass();
+		
+		Transfer toSend = new Transfer();
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<Transfer> entity = new HttpEntity<>(toSend, headers);
+		
 		
 		String url = BASE_URL + "/transfers";
-		
+		/*
 		Transfer sendTransfer = makeBasicTransfer(amount, get_user_acct, receivingAcct);
 		sendTransfer.setType(Transfer.Type.SEND);
 		sendTransfer.setStatus(Transfer.Status.APPROVED);
+		*/
+		
+		Transfer confirmed = null;
 		
 		try {
 			// TODO: send transfer to server as POST method
+			// is that exchange method
+			confirmed = restTemplate.postForObject(url, entity, Transfer.class);		
 		}
 		catch (RestClientResponseException e) {
 			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
 		}
 		
-		return sendTransfer;
+		return confirmed;
 	}
 	
 	/**
@@ -85,23 +83,43 @@ public class TransferService {
 	public Transfer requestTransfer(AuthenticatedUser user, BigDecimal amount, Account requestedAcct) {
 		
 		// TODO: need to get the authenticated user's acct
-		Transfer requestTransfer = makeBasicTransfer(amount, get_user_acct, requestedAcct);
-		requestTransfer.setType(Transfer.Type.REQUEST);
-		requestTransfer.setStatus(Transfer.Status.PENDING);
+		//Transfer requestTransfer = makeBasicTransfer(amount, get_user_acct, requestedAcct);
+		//requestTransfer.setType(Transfer.Type.REQUEST);
+		//requestTransfer.setStatus(Transfer.Status.PENDING);
 		
-		return requestTransfer;
+		return null;
+	}
+	
+	/**
+	 * Checks list of pending requests from database
+	 * @param user 
+	 * @return pendingRequests
+	 */
+	public List<Request> getPendingRequests(AuthenticatedUser user) {
+		List<Request> pendingRequests = null;
+		
+		try {
+        	pendingRequests = restTemplate.exchange(BASE_URL + "/requests", HttpMethod.GET, makeAuthEntity(user.getToken()), List.class).getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+        }
+		return pendingRequests;
 	}
 	
 	
 	
-	private Transfer makeBasicTransfer(BigDecimal amount, Account userAcct, Account receivingAcct) {
+	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, Long userFromId) {
+		// takes in amount, userToId, principal
+		//userId, NOT acctId
+		
 		Transfer newTransfer = new Transfer();
-		newTransfer.setAcctFromId(userAcct.getAccountId());
-		newTransfer.setAcctToId(receivingAcct.getAccountId());
 		newTransfer.setAmount(amount);
+		newTransfer.setUserFromId(userFromId);
+		newTransfer.setUserToId(userToId);
 		
 		return newTransfer;
 	}
+	
 	
 	
 	private HttpEntity makeAuthEntity(String token) {
