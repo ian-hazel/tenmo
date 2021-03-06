@@ -8,7 +8,7 @@ import com.techelevator.tenmo.model.Transfer;
 
 public interface TransferDAO {
 	
-	List<Transfer> getAll(Principal principal);
+	List<Transfer> getTransferHistory(Principal principal);
 
 	void sendMoney(BigDecimal amount, Long accountToId, Principal principal);
 	
