@@ -36,35 +36,17 @@ public class TransferService {
 	 * @param user, amount, receivingAcct
 	 * @return new sent transfer
 	 */
-	public Transfer sendTransfer(BigDecimal amount, Long userToId, Principal principal) {
-		// should this be void? --> if sent to server in try/catch, should go through/throw exception, no need for return
-		// TODO: send BigDecimal amount, Long userToId, Principal principal
-		//int sendingUserAcct = user.getUser().getId();
-		// TODO: need to get the authenticated user's acct
+	public Transfer sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user, Principal principal) {
 		
-		Transfer toSend = new Transfer();
-		toSend.setAmount(amount);
-		// TODO: need to set userFromId/identifying characteristic
-		toSend.setUserToId(userToId);
+		Transfer toSend = makeBasicTransfer(amount, userToId, principal);
 		toSend.setType(Transfer.Type.SEND);
 		toSend.setStatus(Transfer.Status.APPROVED);
 		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<Transfer> entity = new HttpEntity<>(toSend, headers);
-		
-		
-		String url = BASE_URL + "/transfers";
-		/*
-		Transfer sendTransfer = makeBasicTransfer(amount, userToId, receivingAcct);
-		*/
-		
+		String url = BASE_URL + "transfers/";		
 		Transfer confirmed = null;
 		
 		try {
-			// TODO: send transfer to server as POST method
-			// is that exchange method
-			confirmed = restTemplate.postForObject(url, entity, Transfer.class);		
+			confirmed = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), Transfer.class);		
 		}
 		catch (RestClientResponseException e) {
 			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
@@ -92,6 +74,32 @@ public class TransferService {
 		return null;
 	}
 	
+	public List<Transfer> getTransferHistory(Principal principal, AuthenticatedUser user) {
+		List<Transfer> transferHistory = null;
+		String url = BASE_URL + "transfers/";
+		
+		try {
+			transferHistory = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), List.class).getBody();
+		}
+		catch (RestClientResponseException ex) {
+            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+		}
+		return transferHistory;
+	}
+	
+	public Transfer getTransferDetails(Principal principal, AuthenticatedUser user, Long transferId) {
+		Transfer thisTransfer = null;
+		String url = BASE_URL + "transfers/" + transferId;
+		
+		try {
+			thisTransfer = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer.class).getBody();
+		}
+		catch (RestClientResponseException ex) {
+            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+		}
+		return thisTransfer;
+	}
+	
 	/**
 	 * Checks list of pending requests from database
 	 * @param user 
@@ -110,13 +118,12 @@ public class TransferService {
 	
 	
 	
-	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, Long userFromId) {
+	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, Principal principal) {
 		// takes in amount, userToId, principal
-		
 		Transfer newTransfer = new Transfer();
 		newTransfer.setAmount(amount);
-		newTransfer.setUserFromId(userFromId);
 		newTransfer.setUserToId(userToId);
+		newTransfer.setPrincipal(principal);
 		
 		return newTransfer;
 	}
@@ -127,6 +134,14 @@ public class TransferService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setBearerAuth(token);
 		HttpEntity entity = new HttpEntity<>(headers);
+		return entity;
+	}
+	
+	private HttpEntity<Transfer> makeTransferEntity(Transfer transfer, String token) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setBearerAuth(token);
+		HttpEntity<Transfer> entity = new HttpEntity<>(transfer, headers);
 		return entity;
 	}
 	
