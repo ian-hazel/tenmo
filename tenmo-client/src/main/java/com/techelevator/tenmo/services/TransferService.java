@@ -41,9 +41,13 @@ public class TransferService {
 		// TODO: send BigDecimal amount, Long userToId, Principal principal
 		//int sendingUserAcct = user.getUser().getId();
 		// TODO: need to get the authenticated user's acct
-		principal.getClass();
 		
 		Transfer toSend = new Transfer();
+		toSend.setAmount(amount);
+		// TODO: need to set userFromId/identifying characteristic
+		toSend.setUserToId(userToId);
+		toSend.setType(Transfer.Type.SEND);
+		toSend.setStatus(Transfer.Status.APPROVED);
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -52,9 +56,7 @@ public class TransferService {
 		
 		String url = BASE_URL + "/transfers";
 		/*
-		Transfer sendTransfer = makeBasicTransfer(amount, get_user_acct, receivingAcct);
-		sendTransfer.setType(Transfer.Type.SEND);
-		sendTransfer.setStatus(Transfer.Status.APPROVED);
+		Transfer sendTransfer = makeBasicTransfer(amount, userToId, receivingAcct);
 		*/
 		
 		Transfer confirmed = null;
@@ -110,7 +112,6 @@ public class TransferService {
 	
 	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, Long userFromId) {
 		// takes in amount, userToId, principal
-		//userId, NOT acctId
 		
 		Transfer newTransfer = new Transfer();
 		newTransfer.setAmount(amount);
