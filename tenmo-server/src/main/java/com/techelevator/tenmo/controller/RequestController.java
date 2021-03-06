@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,23 +39,16 @@ public class RequestController {
 	
 	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(value = "/requests/{id}", method = RequestMethod.PUT)
-	public void approveRequestById(@PathVariable Long transferId, Principal principal) 
+	public void approveRequestById(@PathVariable Long transferId, Principal principal, @RequestParam(required = true) Long append) 
 			throws TransferNotFoundException {
 		try {
-			requestDao.approveRequest(transferId, principal);
+			if(append == 1) {
+				requestDao.approveRequest(transferId, principal);
+			} else if (append == 2){
+				requestDao.rejectRequest(transferId, principal);
+			} else {
+			}
 		} catch(TransferNotFoundException e) {
 		}
 	}
-	/*
-	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = "/requests/{id}", method = RequestMethod.PUT)
-	public void rejectRequestById(@PathVariable Long transferId, Principal principal) 
-			throws TransferNotFoundException {
-		try {
-			requestDao.rejectRequest(transferId, principal);
-		}catch(TransferNotFoundException e) {
-		}
-	}
-	*/
-	
 }
