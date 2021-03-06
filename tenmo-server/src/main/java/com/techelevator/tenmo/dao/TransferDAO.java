@@ -10,11 +10,11 @@ public interface TransferDAO {
 	
 	List<Transfer> getAll(Principal principal);
 
-	Integer sendMoney(BigDecimal amount, Long accountToId, Principal principal);
+	void sendMoney(BigDecimal amount, Long accountToId, Principal principal);
 	
-	Integer requestMoney(BigDecimal amount, Long accountToId, Principal principal);
+	void requestMoney(BigDecimal amount, Long accountToId, Principal principal);
 	
-	Integer approveTransfer(Long transferId, Principal principal);
+	void approveTransfer(Long transferId, Principal principal);
 	
-	Integer rejectTransfer(Long transferId, Principal principal);
+	void rejectTransfer(Long transferId, Principal principal);
 }
