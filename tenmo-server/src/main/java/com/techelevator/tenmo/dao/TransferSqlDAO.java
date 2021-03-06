@@ -57,45 +57,30 @@ public class TransferSqlDAO implements TransferDAO {
 
 
 	@Override
-	public void approveTransfer(Long transferId, Principal principal) {
-		BigDecimal amount = jdbcTemplate.queryForObject("SELECT amount FROM transfers WHERE transfer_id = ?",
-				BigDecimal.class, transferId);
-		Long accountToId = jdbcTemplate.queryForObject("SELECT account_to FROM transfers WHERE transfer_id = ?",
-				Long.class, transferId);
-		Long accountFromId = getAccountFromId(principal);
-		if (checkBalance(amount, principal)) {
-			String sqlUpdateSender = "UPDATE accounts SET balance = balance - ? WHERE account_id = ?";
-			try {
-				jdbcTemplate.update(sqlUpdateSender, amount, accountFromId);
-			} catch (DataAccessException e) {
-			}
-			String sqlUpdateReceiver = "UPDATE accounts SET balance = balance + ? WHERE account_id = ?";
-			try {
-				jdbcTemplate.update(sqlUpdateReceiver, amount, accountToId);
-			} catch (DataAccessException e) {
-			}
-			updateTransfers(transferId);
-		}
-	}
-
-	@Override
-	public void rejectTransfer(Long transferId, Principal principal) {
-		String sqlRejectTransfer = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
-		jdbcTemplate.update(sqlRejectTransfer, transferId);
-	}
-
-	@Override
 	public List<Transfer> getTransferHistory(Principal principal) {
 		List<Transfer> transfers = new ArrayList<>();
 		String sqlGetAllTransfer = "SELECT transfer_id, transfer_type_id, "
 				+ "transfer_status_id, account_from, account_to, amount "
 				+ "FROM transfers  WHERE account_from = ? OR account_to = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllTransfer, getAccountFromId(principal), getAccountFromId(principal));
-		while(results.next()) {
-			Transfer transfer = mapTransferDetails(results);
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllTransfer, Transfer.class, getAccountFromId(principal), getAccountFromId(principal));
+		while(results.next()){
+			Transfer transfer = mapRowToTransfer(results);
 			transfers.add(transfer);
 		}
 		return transfers;
+	}
+	
+	@Override
+	public Transfer getTransferDetails(Long transferId, Principal principal) {
+		Transfer transfer = new Transfer();
+		String sqlGetTransferDetails = "SELECT transfer_id, transfer_type_id, "
+				+ "transfer_status_id, account_from, account_to, amount "
+				+ "FROM transfers WHERE transfer_id = ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetTransferDetails, Transfer.class, transferId);
+		while(results.next()) {
+			transfer = mapRowToTransfer(results);
+		}
+		return transfer;
 	}
 	
 	private boolean checkBalance(BigDecimal amount, Principal principal) {
@@ -108,7 +93,7 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 	}
 	
-	private String getNameFromAccountId(Long accountId) {
+	private String getUsername(Long accountId) {
 		String sqlGetName = "SELECT name FROM accounts WHERE account_id = ?";
 		return jdbcTemplate.queryForObject(sqlGetName, String.class, accountId);
 	}
@@ -133,16 +118,7 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 	}
 	
-	private void updateTransfers(Long transferId){
-		String updateTransfers = "UPDATE transfers SET transfer_status_id = 2 WHERE transfer_id = ?";
-		try {
-			jdbcTemplate.update(updateTransfers, transferId);
-		} catch (DataAccessException e) {
-			
-		}
-	}
-
-	private Transfer mapTransferDetails(SqlRowSet results) {
+	private Transfer mapRowToTransfer(SqlRowSet results) {
 		Transfer transfer = new Transfer();
 		transfer.setTransferId(results.getLong("transfer_id"));
 		Long type = results.getLong("transfer_type_id");
@@ -159,8 +135,8 @@ public class TransferSqlDAO implements TransferDAO {
 		} else {
 			transfer.setStatus("Rejected");
 		}
-		transfer.setAccountFromName(getNameFromAccountId(results.getLong("account_from")));
-		transfer.setAccountToName(getNameFromAccountId(results.getLong("account_to")));
+		transfer.setAccountFrom(getUsername(results.getLong("account_from")));
+		transfer.setAccountTo(getUsername(results.getLong("account_to")));
 		transfer.setAmount(results.getBigDecimal("amount"));
 		return transfer;
 	}
