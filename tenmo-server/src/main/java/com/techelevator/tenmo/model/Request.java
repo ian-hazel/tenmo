@@ -7,8 +7,8 @@ public class Request {
 	private Long transferId;
 	private String transferType;
 	private String transferStatus;
-	private Long accountFrom;
-	private Long accountTo;
+	private String accountFrom;
+	private String accountTo;
 	private BigDecimal amount;
 	
 	public Long getTransferId() {
@@ -43,19 +43,19 @@ public class Request {
 		this.transferStatus = transferStatus;
 	}
 
-	public Long getAccountFrom() {
+	public String getAccountFrom() {
 		return accountFrom;
 	}
 
-	public void setAccountFrom(Long accountFrom) {
+	public void setAccountFrom(String accountFrom) {
 		this.accountFrom = accountFrom;
 	}
 
-	public Long getAccountTo() {
+	public String getAccountTo() {
 		return accountTo;
 	}
 
-	public void setAccountTo(Long accountTo) {
+	public void setAccountTo(String accountTo) {
 		this.accountTo = accountTo;
 	}
 
