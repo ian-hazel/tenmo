@@ -4,19 +4,23 @@ import java.math.BigDecimal;
 
 public class Transfer {
 
+	private Long transferId;
 	private String type;
 	private String status;
+	private String accountFromName;
+	private String accountToName;
 	private BigDecimal amount;
-	private Long transferId;
-	private Long accountFromId;
-	private Long accountToId;
+	
+	public Long getTransferId() {
+		return transferId;
+	}
+
+	public void setTransferId(Long transferId) {
+		this.transferId = transferId;
+	}
 
 	public String getType() {
-		if(type.equals("1")) {
-			return "Request";
-		} else {
-			return "Send";
-		}
+		return type;
 	}
 
 	public void setType(String type) {
@@ -24,13 +28,7 @@ public class Transfer {
 	}
 
 	public String getStatus() {
-		if(status.equals("1")) {
-			return "Pending";
-		} else if(status.equals("2")) {
-			return "Approved";
-		} else {
-			return "Rejected";
-		}
+		return status;
 	}
 
 	public void setStatus(String status) {
@@ -45,28 +43,19 @@ public class Transfer {
 		this.amount = amount;
 	}
 
-	public Long getTransferId() {
-		return transferId;
+	public String getAccountFromName() {
+		return accountFromName;
 	}
 
-	public void setTransferId(Long transferId) {
-		this.transferId = transferId;
+	public void setAccountFromName(String accountFromName) {
+		this.accountFromName = accountFromName;
 	}
 
-	public Long getAccountFromId() {
-		return accountFromId;
+	public String getAccountToName() {
+		return accountToName;
 	}
 
-	public void setAccountFromId(Long accountFromId) {
-		this.accountFromId = accountFromId;
+	public void setAccountToName(String accountToName) {
+		this.accountToName = accountToName;
 	}
-
-	public Long getAccountToId() {
-		return accountToId;
-	}
-
-	public void setAccountToId(Long accountToId) {
-		this.accountToId = accountToId;
-	}
-
 }

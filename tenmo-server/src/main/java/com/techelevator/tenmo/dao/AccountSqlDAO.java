@@ -20,11 +20,5 @@ public class AccountSqlDAO implements AccountDAO {
 		String sqlGetBalance = "SELECT balance FROM accounts JOIN users USING(user_id) WHERE username = ?";
 		return jdbcTemplate.queryForObject(sqlGetBalance, BigDecimal.class, principal.getName());
 	}
-
-	@Override
-	public void setBalance(Principal principal, BigDecimal balance) {
-		String sqlUpdateBalance = "UPDATE accounts SET balance = ? WHERE account_id = ?";
-		jdbcTemplate.update(sqlUpdateBalance, balance, principal.getName());
-	}
 	
 }
