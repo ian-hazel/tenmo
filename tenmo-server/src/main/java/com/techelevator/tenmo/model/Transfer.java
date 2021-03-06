@@ -7,8 +7,8 @@ public class Transfer {
 	private Long transferId;
 	private String type;
 	private String status;
-	private String accountFromName;
-	private String accountToName;
+	private String accountFrom;
+	private String accountTo;
 	private BigDecimal amount;
 	
 	public Long getTransferId() {
@@ -43,19 +43,19 @@ public class Transfer {
 		this.amount = amount;
 	}
 
-	public String getAccountFromName() {
-		return accountFromName;
+	public String getAccountFrom() {
+		return accountFrom;
 	}
 
-	public void setAccountFromName(String accountFromName) {
-		this.accountFromName = accountFromName;
+	public void setAccountFrom(String accountFrom) {
+		this.accountFrom = accountFrom;
 	}
 
-	public String getAccountToName() {
-		return accountToName;
+	public String getAccountTo() {
+		return accountTo;
 	}
 
-	public void setAccountToName(String accountToName) {
-		this.accountToName = accountToName;
+	public void setAccountTo(String accountTo) {
+		this.accountTo = accountTo;
 	}
 }
