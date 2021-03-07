@@ -14,7 +14,7 @@ public class BaseSqlDAOTest {
     @BeforeClass
     public static void setupDataSource() {
         dataSource = new SingleConnectionDataSource();
-        dataSource.setUrl("/localhost:8080");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/tenmo");
         dataSource.setUsername("postgres");
         dataSource.setPassword("postgres1");
         dataSource.setAutoCommit(false);
@@ -29,9 +29,5 @@ public class BaseSqlDAOTest {
     public void rollback() throws SQLException {
         dataSource.getConnection().rollback();
     }
-	
-	
-	
-	
 
 }

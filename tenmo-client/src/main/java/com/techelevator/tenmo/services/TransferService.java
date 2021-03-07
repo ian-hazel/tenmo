@@ -42,7 +42,7 @@ public class TransferService {
 		toSend.setType(Transfer.Type.SEND);
 		toSend.setStatus(Transfer.Status.APPROVED);
 		
-		String url = BASE_URL + "transfers/";		
+		String url = BASE_URL + "/transfers";		
 		Transfer confirmed = null;
 		
 		try {
@@ -76,7 +76,7 @@ public class TransferService {
 	
 	public Transfer[] getTransferHistory(Principal principal, AuthenticatedUser user) {
 		Transfer[] transferHistory = null;
-		String url = BASE_URL + "transfers/";
+		String url = BASE_URL + "/transfers";
 		
 		try {
 			transferHistory = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer[].class).getBody();
@@ -89,7 +89,7 @@ public class TransferService {
 	
 	public Transfer getTransferDetails(Principal principal, AuthenticatedUser user, Long transferId) {
 		Transfer thisTransfer = null;
-		String url = BASE_URL + "transfers/" + transferId;
+		String url = BASE_URL + "/transfers" + transferId;
 		
 		try {
 			thisTransfer = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer.class).getBody();
@@ -109,9 +109,10 @@ public class TransferService {
 		Request[] pendingRequests = null;
 		
 		try {
-        	pendingRequests = restTemplate.exchange(BASE_URL + "requests/", HttpMethod.GET, makeAuthEntity(user.getToken()), Request[].class).getBody();
+        	pendingRequests = restTemplate.exchange(BASE_URL + "requests", HttpMethod.GET, makeAuthEntity(user.getToken()), Request[].class).getBody();
         } catch (RestClientResponseException ex) {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+            ex.printStackTrace();
         }
 		return pendingRequests;
 	}
@@ -131,7 +132,7 @@ public class TransferService {
 		headers.setBearerAuth(user.getToken());
 		HttpEntity<Integer> entity = new HttpEntity<>(userChoice, headers);
 		
-		String url = BASE_URL + "requests?append=" + request.getTransferId();		
+		String url = BASE_URL + "/requests?append=" + request.getTransferId();		
 		
 		try {
 			restTemplate.put(url, entity);
