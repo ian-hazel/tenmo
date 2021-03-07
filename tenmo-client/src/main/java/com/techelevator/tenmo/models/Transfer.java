@@ -9,13 +9,32 @@ public class Transfer {
 	private Long userFromId;
 	private Long userToId;
 	private BigDecimal amount;
+	private Type type;
+	private Status status;
 	private Principal principal;
 	
-	public enum Type { REQUEST, SEND }
-	private Type type;
+	public enum Type {
+		REQUEST(1),
+		SEND(2);
+		
+		public final int value;
+		
+		private Type(int value) {
+			this.value = value;
+		}
+	}
 	
-	public enum Status { PENDING, APPROVED, REJECTED }
-	private Status status;
+	public enum Status {
+		PENDING(1),
+		APPROVED(2),
+		REJECTED(3);
+		
+		public final int value;
+		
+		private Status(int value) {
+			this.value = value;
+		}
+	}
 	
 	public Transfer() {
 		
