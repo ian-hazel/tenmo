@@ -28,13 +28,13 @@ public class RequestController {
 
 	@RequestMapping(value = "requests", method = RequestMethod.GET)
 	public List<Request> getAllRequests(Principal principal) {
-		return requestDao.getAllRequests(principal);
+		return requestDao.getAllRequests(principal.getName());
 	}
 	
 	@RequestMapping(value = "requests/{id}", method = RequestMethod.GET)
 	public Request viewRequestById(@PathVariable Long transferId, Principal principal) 
 			throws TransferNotFoundException {
-		return requestDao.getRequestByTransferId(transferId, principal);
+		return requestDao.getRequestByTransferId(transferId, principal.getName());
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
@@ -43,9 +43,9 @@ public class RequestController {
 			throws TransferNotFoundException {
 		try {
 			if(append == 1) {
-				requestDao.approveRequest(transferId, principal);
+				requestDao.approveRequest(transferId, principal.getName());
 			} else if (append == 2){
-				requestDao.rejectRequest(transferId, principal);
+				requestDao.rejectRequest(transferId);
 			} else {
 			}
 		} catch(TransferNotFoundException e) {

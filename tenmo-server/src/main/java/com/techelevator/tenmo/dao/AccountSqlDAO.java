@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.dao;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -16,9 +15,9 @@ public class AccountSqlDAO implements AccountDAO {
     }
 	
 	@Override
-	public BigDecimal getBalance(Principal principal) {
+	public BigDecimal getBalance(String username) {
 		String sqlGetBalance = "SELECT balance FROM accounts JOIN users USING(user_id) WHERE username = ?";
-		return jdbcTemplate.queryForObject(sqlGetBalance, BigDecimal.class, principal.getName());
+		return jdbcTemplate.queryForObject(sqlGetBalance, BigDecimal.class, username);
 	}
 	
 }
