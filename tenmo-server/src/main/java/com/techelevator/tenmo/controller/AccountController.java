@@ -22,7 +22,7 @@ public class AccountController {
 
 	@RequestMapping(value = "balance", method = RequestMethod.GET)
 	public BigDecimal getBalance(Principal principal) {
-		return accountDao.getBalance(principal);
+		return accountDao.getBalance(principal.getName());
 	}
 
 }

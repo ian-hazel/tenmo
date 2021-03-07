@@ -23,13 +23,13 @@ public class RequestSqlDAO implements RequestDAO {
 	}
 
 	@Override
-	public List<Request> getAllRequests(Principal principal) {
+	public List<Request> getAllRequests(String username) {
 		List<Request> requests = new ArrayList<>();
 		String sqlGetAllRequests = "SELECT t.transfer_id, t.amount, u.user_id "
 				+ "FROM transfers t JOIN accounts a ON t.account_to = a.account_id "
 				+ "JOIN users u USING(user_id) "
 				+ "WHERE t.transfer_status_id = 1 AND a.account_id = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequests, Request.class, getAccountId(principal));
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequests, Request.class, username);
 		while (results.next()) {
 			Request request = mapRowToRequest(results);
 			requests.add(request);
@@ -38,13 +38,13 @@ public class RequestSqlDAO implements RequestDAO {
 	}
 	
 	@Override
-	public Request getRequestByTransferId(Long transferId, Principal principal) 
+	public Request getRequestByTransferId(Long transferId, String username) 
 			 throws TransferNotFoundException {
 		Request request = new Request();
 		String sqlGetAllRequest = "SELECT t.transfer_id, t.account_to, t.amount "
 				+ "FROM transfers t JOIN accounts a ON t.account_from = a.account_id "
 				+ "WHERE t.status = 1 AND a.account_id = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequest, Request.class, getAccountId(principal));
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequest, Request.class, username);
 		while (results.next()) {
 			request = mapRowToRequest(results);
 		}
@@ -52,14 +52,14 @@ public class RequestSqlDAO implements RequestDAO {
 	}
 
 	@Override
-	public void approveRequest(Long transferId, Principal principal) 
+	public void approveRequest(Long transferId, String username) 
 			throws TransferNotFoundException {
 		BigDecimal amount = jdbcTemplate.queryForObject("SELECT amount FROM transfers WHERE transfer_id = ?",
 				BigDecimal.class, transferId);
 		Long accountToId = jdbcTemplate.queryForObject("SELECT account_to FROM transfers WHERE transfer_id = ?",
 				Long.class, transferId);
-		Long accountFromId = getAccountId(principal);
-		if (checkBalance(amount, principal)) {
+		Long accountFromId = getAccountId(username);
+		if (checkBalance(amount, username)) {
 			String sqlUpdateSender = "UPDATE accounts SET balance = balance - ? WHERE account_id = ?";
 			try {
 				jdbcTemplate.update(sqlUpdateSender, amount, accountFromId);
@@ -75,7 +75,7 @@ public class RequestSqlDAO implements RequestDAO {
 	}
 
 	@Override
-	public void rejectRequest(Long transferId, Principal principal) 
+	public void rejectRequest(Long transferId) 
 			throws TransferNotFoundException {
 		String sqlRejectRequest = "UPDATE transfers SET transfer_status_id = 3 WHERE transfer_id = ?";
 		jdbcTemplate.update(sqlRejectRequest, transferId);
@@ -89,9 +89,9 @@ public class RequestSqlDAO implements RequestDAO {
 		}
 	}
 	
-	private boolean checkBalance(BigDecimal amount, Principal principal) {
+	private boolean checkBalance(BigDecimal amount, String username) {
 		BigDecimal balance = jdbcTemplate.queryForObject("SELECT balance FROM accounts "
-				+"JOIN users USING(user_id) WHERE username = ?", BigDecimal.class, principal.getName());
+				+"JOIN users USING(user_id) WHERE username = ?", BigDecimal.class, username);
 		if (balance.compareTo(amount) > 0) {
 			return true;
 		} else {
@@ -99,9 +99,9 @@ public class RequestSqlDAO implements RequestDAO {
 		}
 	}
 	
-	private Long getAccountId(Principal principal) {
+	private Long getAccountId(String username) {
 		Long accountId = jdbcTemplate.queryForObject("SELECT account_id FROM accounts "
-				+ "JOIN users USING(user_id) WHERE username = ?", Long.class, principal.getName());
+				+ "JOIN users USING(user_id) WHERE username = ?", Long.class, username);
 		return accountId;
 	}
 	
