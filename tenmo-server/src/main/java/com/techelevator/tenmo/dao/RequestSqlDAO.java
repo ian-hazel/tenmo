@@ -25,8 +25,9 @@ public class RequestSqlDAO implements RequestDAO {
 	@Override
 	public List<Request> getAllRequests(Principal principal) {
 		List<Request> requests = new ArrayList<>();
-		String sqlGetAllRequests = "SELECT t.transfer_id, t.account_to, t.amount "
-				+ "FROM transfers t JOIN accounts a ON t.account_from = a.account_id "
+		String sqlGetAllRequests = "SELECT t.transfer_id, t.amount, u.user_id "
+				+ "FROM transfers t JOIN accounts a ON t.account_to = a.account_id "
+				+ "JOIN users u USING(user_id) "
 				+ "WHERE t.transfer_status_id = 1 AND a.account_id = ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequests, Request.class, getAccountId(principal));
 		while (results.next()) {

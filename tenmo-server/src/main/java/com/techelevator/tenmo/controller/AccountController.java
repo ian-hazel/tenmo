@@ -20,7 +20,7 @@ public class AccountController {
 		this.accountDao = accountDao;
 	}
 
-	@RequestMapping(value = "/balance", method = RequestMethod.GET)
+	@RequestMapping(value = "balance", method = RequestMethod.GET)
 	public BigDecimal getBalance(Principal principal) {
 		return accountDao.getBalance(principal);
 	}

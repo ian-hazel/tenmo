@@ -55,7 +55,6 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 	}
 
-
 	@Override
 	public List<Transfer> getTransferHistory(Principal principal) {
 		List<Transfer> transfers = new ArrayList<>();

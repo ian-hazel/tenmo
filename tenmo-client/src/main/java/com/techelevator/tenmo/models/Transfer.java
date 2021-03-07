@@ -1,37 +1,25 @@
 package com.techelevator.tenmo.models;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 
 public class Transfer {
 
 	private Long transferId;
-	private Long userFromId;
-	private Long userToId;
+	private String fromName;
+	private String toName;
+	private Long userId;	
 	private BigDecimal amount;
-	private Principal principal;
-	
-	public enum Type { REQUEST, SEND }
-	private Type type;
-	
-	public enum Status { PENDING, APPROVED, REJECTED }
-	private Status status;
+	private String type;
+	private String status;
 	
 	public Transfer() {
 		
 	}
-	/*
-	public Transfer(BigDecimal amount, Type type, Status status) {
-		this.amount = amount;
-		this.type = type;
-		this.status = status;
-	}
-	*/
-	
-	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
+
+	public Transfer(Long transferId, String fromName, String toName, BigDecimal amount, String type, String status) {
 		this.transferId = transferId;
-		this.userFromId = userFromId;
-		this.userToId = userToId;
+		this.fromName = fromName;
+		this.toName = toName;
 		this.amount = amount;
 		this.type = type;
 		this.status = status;	
@@ -45,20 +33,20 @@ public class Transfer {
 		this.transferId = transferId;
 	}
 
-	public Long getUserFromId() {
-		return userFromId;
+	public String getFromName() {
+		return fromName;
 	}
 
-	public void setUserFromId(Long userFromId) {
-		this.userFromId = userFromId;
+	public void setFromName(String fromName) {
+		this.fromName = fromName;
 	}
 
-	public Long getUserToId() {
-		return userToId;
+	public String getToName() {
+		return toName;
 	}
 
-	public void setUserToId(Long userToId) {
-		this.userToId = userToId;
+	public void setToName(String toName) {
+		this.toName = toName;
 	}
 
 	public BigDecimal getAmount() {
@@ -69,28 +57,28 @@ public class Transfer {
 		this.amount = amount;
 	}
 	
-	public Type getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 
-	public Status getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(Status status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
-	public Principal getPrincipal() {
-		return principal;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setPrincipal(Principal principal) {
-		this.principal = principal;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 	
 }

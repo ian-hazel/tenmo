@@ -13,6 +13,7 @@ public class AccountSqlDAOTest extends BaseSqlDAOTest {
 	private AccountSqlDAO account;
 	private UserSqlDAO user;
 	
+	
 	@Before
 	public void setup() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -24,7 +25,7 @@ public class AccountSqlDAOTest extends BaseSqlDAOTest {
 	
 	@Test
 	public void test_get_balance_works_correctly() {
-//		Assert.assertEquals(1000, account.getBalance(user));
+//		Assert.assertEquals(1000, account.getBalance("Test1"));
 	}
 	
 	

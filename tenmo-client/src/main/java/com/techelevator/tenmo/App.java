@@ -1,20 +1,13 @@
 package com.techelevator.tenmo;
 
 import java.math.BigDecimal;
-import java.security.Principal;
-import java.text.NumberFormat;
-import java.util.List;
-
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
-import com.techelevator.tenmo.models.Request;
-import com.techelevator.tenmo.models.Transfer;
-import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
+import com.techelevator.tenmo.services.RequestService;
 import com.techelevator.tenmo.services.TransferService;
 import com.techelevator.view.ConsoleService;
 
@@ -39,22 +32,24 @@ private static final String API_BASE_URL = "http://localhost:8080/";
     private AuthenticationService authenticationService;
 	private AccountService accountService;
 	private TransferService transferService;
-	private Principal principal;
+	private RequestService requestService;
 
     public static void main(String[] args) {
-    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), new AccountService(API_BASE_URL), new TransferService(API_BASE_URL));
+    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), 
+    			new AccountService(API_BASE_URL), new TransferService(API_BASE_URL), new RequestService(API_BASE_URL));
     	app.run();
     }
 
-    public App(ConsoleService console, AuthenticationService authenticationService, AccountService accountService, TransferService transferService) {
+    public App(ConsoleService console, AuthenticationService authenticationService, AccountService accountService, TransferService transferService, RequestService requestService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
 		this.accountService = accountService;
 		this.transferService = transferService;
+		this.requestService = requestService;
 	}
 
 	public void run() {
-		console.printHeader();
+		console.printHello();
 		registerAndLogin();
 		mainMenu();
 	}
@@ -82,78 +77,61 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void viewCurrentBalance() {
-		console.message(NumberFormat.getCurrencyInstance().format(accountService.getBalance(currentUser)));	
+		console.printBalance(accountService.getBalance(currentUser));	
 	}
 
 	private void viewTransferHistory() {
-		// TODO: move some to console service to streamline
-		System.out.println("---------------------------------------------");
-		System.out.println("Transfers                                    ");
-		System.out.println("ID            From/To                  Amount");
-		System.out.println("---------------------------------------------");
-		Transfer[] transfers = transferService.getTransferHistory(principal, currentUser);
-		for (Transfer transfer : transfers) {
-		// TODO: get print line working, needs from/to definition and the transfer name
-			//	System.out.println(transfer.getTransferId() + "        " + transfer.getType()) + transfer.get "                   " + NumberFormat.getCurrencyInstance().format(transfer.getAmount());
+		Long result = console.printTransferHistory(transferService.getTransferHistory(currentUser));
+		if(result == 0) {
+			mainMenu();
+		} else {
+			viewDetailedTransfer(result);
 		}
-	}
-
-	private void viewPendingRequests() {
-		//TODO: move formatting/display header to console service/make pretty
-		System.out.println("---------------------------------------------");
-		System.out.println("Pending Transfer                             ");
-		System.out.println("ID          To                   Amount      ");
-		System.out.println("---------------------------------------------");
-		Request[] pendingRequests = transferService.getPendingRequests(currentUser);
-		for (Request pending : pendingRequests) {
-			System.out.println(pending.getTransferId() + "    " + pending.getUsername() + "           " + pending.getAmount());
-		}
-		System.out.println("----------");
-		Long userToId = (long)console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel):");
-		// TODO: run approveOrRejectRequest
 	}
 	
-	private void approveOrRejectRequest() {
-		// TODO: case 9 in readme, pass int with 1 or 2, object, principal
-		
+	public void viewDetailedTransfer(Long transferId) {
+		console.transferDetails(transferService.getTransferDetails(currentUser, transferId));
+		viewTransferHistory();
+	}
+	
+	private void viewPendingRequests() {
+		Long result = console.requestsMenu(requestService.getPendingRequests(currentUser));
+		if(result == 0) {
+			mainMenu();
+		} else {
+			requestReponse(result);
+		}
+	}
+	
+	private void requestReponse(Long transferId) {
+		Long result = console.appendRequests();
+		if(result == 0) {
+			mainMenu();
+		} else {
+			requestService.requestResponse(transferId, result, currentUser);
+		}
 	}
 
 	private void sendBucks() {
-//		TODO: move formatting/display header to console service/make pretty
-		System.out.println("---------------------------------------------");
-		System.out.println("Users                                        ");
-		System.out.println("ID               Name                        ");
-		System.out.println("---------------------------------------------");
-		
-		User[] allUsers = transferService.getAllUsers(currentUser);
-		for (User user : allUsers) {
-			System.out.println(user.getId() + "           " + user.getUsername() + "           ");
+		Long userId = console.sendTransfer(transferService.sendTransfer(currentUser));
+		if(userId == 0) {
+			mainMenu();
+		} else {
+			BigDecimal amount = console.getTransferAmount();
+			transferService.sendTransfer(userId, amount, currentUser);
 		}
-		System.out.println("----------");
-		System.out.println();
-		Long userToId = (long)console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel):");
-		BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
-		
-		transferService.sendTransfer(amount, userToId, currentUser, principal);
+		mainMenu();
 	}
 
 	private void requestBucks() {
-//		TODO: move formatting/display header to console service/make pretty
-		System.out.println("---------------------------------------------");
-		System.out.println("Users                                        ");
-		System.out.println("ID               Name                        ");
-		System.out.println("---------------------------------------------");
-		
-		User[] allUsers = transferService.getAllUsers(currentUser);
-		for (User user : allUsers) {
-			System.out.println(user.getId() + "           " + user.getUsername() + "           ");
-		}
-		System.out.println("----------");
-		System.out.println();
-		Long userToId = (long)console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel):");
-		BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
-		
-		transferService.requestTransfer(amount, userToId, currentUser, principal);
+		Long userId = console.requestTransfer(transferService.requestTransfer(currentUser));
+		if(userId == 0) {
+			mainMenu();
+		} else {
+			BigDecimal amount = console.getTransferAmount();
+			transferService.requestTransfer(userId, amount, currentUser);
+		}	
+		mainMenu();
 	}
 	
 	private void exitProgram() {
