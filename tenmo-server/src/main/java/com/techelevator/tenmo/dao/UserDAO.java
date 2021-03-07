@@ -10,6 +10,7 @@ public interface UserDAO {
 
     User findByUsername(String username);
 
+    // TODO: BUG: should not return void
     int findIdByUsername(String username);
 
     boolean create(String username, String password);

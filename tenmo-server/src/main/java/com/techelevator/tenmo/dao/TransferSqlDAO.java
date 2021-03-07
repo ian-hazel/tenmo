@@ -20,8 +20,9 @@ public class TransferSqlDAO implements TransferDAO {
 	public TransferSqlDAO(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
-	
+
 	@Override
+    // TODO: BUG: should not return void
 	public void requestMoney(BigDecimal amount, Long userToId, Principal principal) {
 		Long accountFromId = getAccountFromId(principal);
 		Long accountToId = getAccountToId(userToId);
@@ -35,6 +36,7 @@ public class TransferSqlDAO implements TransferDAO {
 	}
 
 	@Override
+    // TODO: BUG: should not return void
 	public void sendMoney(BigDecimal amount, Long userToId, Principal principal) {
 		Long accountFromId = getAccountFromId(principal);
 		Long accountToId = getAccountToId(userToId);
@@ -55,7 +57,6 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 	}
 
-
 	@Override
 	public List<Transfer> getTransferHistory(Principal principal) {
 		List<Transfer> transfers = new ArrayList<>();
@@ -69,8 +70,9 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return transfers;
 	}
-	
+
 	@Override
+    // TODO: BUG: should take a Transfer, not long. principal is *unused*
 	public Transfer getTransferDetails(Long transferId, Principal principal) {
 		Transfer transfer = new Transfer();
 		String sqlGetTransferDetails = "SELECT transfer_id, transfer_type_id, "
@@ -82,7 +84,7 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return transfer;
 	}
-	
+
 	private boolean checkBalance(BigDecimal amount, Principal principal) {
 		BigDecimal balance = jdbcTemplate.queryForObject("SELECT balance FROM accounts "
 				+"JOIN users USING(user_id) WHERE username = ?", BigDecimal.class, principal.getName());
@@ -92,23 +94,25 @@ public class TransferSqlDAO implements TransferDAO {
 			return false;
 		}
 	}
-	
+
 	private String getUsername(Long accountId) {
 		String sqlGetName = "SELECT name FROM accounts WHERE account_id = ?";
 		return jdbcTemplate.queryForObject(sqlGetName, String.class, accountId);
 	}
-	
+
 	private Long getAccountFromId(Principal principal) {
 		Long accountFromId = jdbcTemplate.queryForObject("SELECT account_id FROM accounts "
 				+ "JOIN users USING(user_id) WHERE username = ?", Long.class, principal.getName());
 		return accountFromId;
 	}
-	
+
+    // TODO: BUG: should take a Transfer, not long.
 	private Long getAccountToId(Long userToId) {
 		Long accountToId = jdbcTemplate.queryForObject("SELECT account_id FROM accounts WHERE user_id = ?", Long.class, userToId);
 		return accountToId;
 	}
-	
+
+    // TODO: BUG: should take a Transfer, not long.
 	private void insertTransfers(Long status, Long accountFromId, Long accountToId, BigDecimal amount) {
 		String sqlSendMoney = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) "
 				+ "VALUES (2, ? , ?, ?, ?)";
@@ -117,7 +121,7 @@ public class TransferSqlDAO implements TransferDAO {
 		} catch (DataAccessException e) {
 		}
 	}
-	
+
 	private Transfer mapRowToTransfer(SqlRowSet results) {
 		Transfer transfer = new Transfer();
 		transfer.setTransferId(results.getLong("transfer_id"));
@@ -140,36 +144,36 @@ public class TransferSqlDAO implements TransferDAO {
 		transfer.setAmount(results.getBigDecimal("amount"));
 		return transfer;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

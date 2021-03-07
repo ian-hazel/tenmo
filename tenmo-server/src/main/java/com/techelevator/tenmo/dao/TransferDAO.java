@@ -9,13 +9,15 @@ import com.techelevator.tenmo.model.exceptions.AccountNotFoundException;
 import com.techelevator.tenmo.model.exceptions.TransferNotFoundException;
 
 public interface TransferDAO {
-	
+
 	List<Transfer> getTransferHistory(Principal principal);
-	
+
 	Transfer getTransferDetails(Long transferId, Principal principal) throws TransferNotFoundException;
 
+    // TODO: BUG: should not return void
 	void sendMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
-	
+
+    // TODO: BUG: should not return void
 	void requestMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
-	
+
 }

@@ -1,6 +1,5 @@
 package com.techelevator.tenmo.dao;
 
-import java.security.Principal;
 import java.util.List;
 
 import com.techelevator.tenmo.model.Request;
@@ -8,12 +7,14 @@ import com.techelevator.tenmo.model.exceptions.TransferNotFoundException;
 
 public interface RequestDAO {
 
-	List<Request> getAllRequests(Principal principal);
+	List<Request> getAllRequests(String username);
 
-	Request getRequestByTransferId(Long transferId, Principal principal) throws TransferNotFoundException;
+	Request getRequestByTransferId(Long transferId, String username) throws TransferNotFoundException;
 
-	void approveRequest(Long transferId, Principal principal) throws TransferNotFoundException;
+    // TODO: BUG: should not return void
+	void approveRequest(Long transferId, String username) throws TransferNotFoundException;
 
-	void rejectRequest(Long transferId, Principal principal) throws TransferNotFoundException;
+    // TODO: BUG: should not return void
+	void rejectRequest(Long transferId) throws TransferNotFoundException;
 
 }

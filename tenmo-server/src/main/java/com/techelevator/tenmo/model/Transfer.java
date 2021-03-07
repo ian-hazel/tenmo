@@ -1,16 +1,43 @@
-package com.techelevator.tenmo.model;
+package com.techelevator.tenmo.models;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 
 public class Transfer {
 
 	private Long transferId;
-	private String type;
-	private String status;
-	private String accountFrom;
-	private String accountTo;
+	private Long userFromId;
+	private Long userToId;
 	private BigDecimal amount;
-	
+	private Principal principal;
+
+	public enum Type { REQUEST, SEND }
+	private Type type;
+
+    // TODO: BUG: add values here
+	public enum Status { PENDING, APPROVED, REJECTED }
+	private Status status;
+
+	public Transfer() {
+
+	}
+	/*
+	public Transfer(BigDecimal amount, Type type, Status status) {
+		this.amount = amount;
+		this.type = type;
+		this.status = status;
+	}
+	*/
+
+	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
+		this.transferId = transferId;
+		this.userFromId = userFromId;
+		this.userToId = userToId;
+		this.amount = amount;
+		this.type = type;
+		this.status = status;
+	}
+
 	public Long getTransferId() {
 		return transferId;
 	}
@@ -19,20 +46,20 @@ public class Transfer {
 		this.transferId = transferId;
 	}
 
-	public String getType() {
-		return type;
+	public Long getUserFromId() {
+		return userFromId;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setUserFromId(Long userFromId) {
+		this.userFromId = userFromId;
 	}
 
-	public String getStatus() {
-		return status;
+	public Long getUserToId() {
+		return userToId;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setUserToId(Long userToId) {
+		this.userToId = userToId;
 	}
 
 	public BigDecimal getAmount() {
@@ -43,19 +70,28 @@ public class Transfer {
 		this.amount = amount;
 	}
 
-	public String getAccountFrom() {
-		return accountFrom;
+	public Type getType() {
+		return type;
 	}
 
-	public void setAccountFrom(String accountFrom) {
-		this.accountFrom = accountFrom;
+	public void setType(Type type) {
+		this.type = type;
 	}
 
-	public String getAccountTo() {
-		return accountTo;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setAccountTo(String accountTo) {
-		this.accountTo = accountTo;
+	public void setStatus(Status status) {
+		this.status = status;
 	}
+
+	public Principal getPrincipal() {
+		return principal;
+	}
+
+	public void setPrincipal(Principal principal) {
+		this.principal = principal;
+	}
+
 }
