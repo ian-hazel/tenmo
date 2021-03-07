@@ -26,19 +26,19 @@ public class RequestController {
 		this.requestDao = requestDao;
 	}
 
-	@RequestMapping(value = "/requests", method = RequestMethod.GET)
+	@RequestMapping(value = "requests", method = RequestMethod.GET)
 	public List<Request> getAllRequests(Principal principal) {
 		return requestDao.getAllRequests(principal);
 	}
 	
-	@RequestMapping(value = "/requests/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "requests/{id}", method = RequestMethod.GET)
 	public Request viewRequestById(@PathVariable Long transferId, Principal principal) 
 			throws TransferNotFoundException {
 		return requestDao.getRequestByTransferId(transferId, principal);
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = "/requests/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "requests/{id}", method = RequestMethod.PUT)
 	public void approveRequestById(@PathVariable Long transferId, Principal principal, @RequestParam(required = true) Long append) 
 			throws TransferNotFoundException {
 		try {

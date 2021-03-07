@@ -31,13 +31,18 @@ public class TransferController {
 		this.userDao = userDao;
 	}
 	
-	@RequestMapping(value = "/transfers", method = RequestMethod.GET)
-	public List<User> findAll() {
+	@RequestMapping(value = "transfers/send", method = RequestMethod.GET)
+	public List<User> findForSend() {
+		return userDao.findAll();
+	}
+	
+	@RequestMapping(value = "transfers/request", method = RequestMethod.GET)
+	public List<User> findForRequest() {
 		return userDao.findAll();
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = "/transfers/send", method = RequestMethod.POST)
+	@RequestMapping(value = "transfers/send", method = RequestMethod.POST)
 	public void sendTransfer(BigDecimal amount, Long userToId, Principal principal) 
 			throws AccountNotFoundException {
 		try {
@@ -47,7 +52,7 @@ public class TransferController {
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = "/transfers/request", method = RequestMethod.POST)
+	@RequestMapping(value = "transfers/request", method = RequestMethod.POST)
 	public void requestTransfer(Principal principal) 
 			throws AccountNotFoundException {
 		try {
@@ -56,12 +61,12 @@ public class TransferController {
 		}
 	}
 		
-	@RequestMapping(value = "/transfers/details", method = RequestMethod.GET)
+	@RequestMapping(value = "transfers/details", method = RequestMethod.GET)
 	public List<Transfer> getTransferHistory(Principal principal) {
 		return transferDao.getTransferHistory(principal);
 	}
 	
-	@RequestMapping(value = "/transfers/details/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "transfers/details/{id}", method = RequestMethod.GET)
 	public Transfer getTransferDetails(@PathVariable Long transferId, Principal principal) 
 			throws TransferNotFoundException {
 		Transfer transfer = new Transfer();

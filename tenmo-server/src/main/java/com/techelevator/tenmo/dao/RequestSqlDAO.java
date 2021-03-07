@@ -25,8 +25,9 @@ public class RequestSqlDAO implements RequestDAO {
 	@Override
 	public List<Request> getAllRequests(Principal principal) {
 		List<Request> requests = new ArrayList<>();
-		String sqlGetAllRequests = "SELECT t.transfer_id, t.account_to, t.amount "
-				+ "FROM transfers t JOIN accounts a ON t.account_from = a.account_id "
+		String sqlGetAllRequests = "SELECT t.transfer_id, t.amount, u.user_id "
+				+ "FROM transfers t JOIN accounts a ON t.account_to = a.account_id "
+				+ "JOIN users u USING(user_id) "
 				+ "WHERE t.transfer_status_id = 1 AND a.account_id = ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequests, Request.class, getAccountId(principal));
 		while (results.next()) {
@@ -103,6 +104,7 @@ public class RequestSqlDAO implements RequestDAO {
 				+ "JOIN users USING(user_id) WHERE username = ?", Long.class, principal.getName());
 		return accountId;
 	}
+	
 	private String getName(Long accountId) {
 		String sqlGetName = "SELECT username FROM users WHERE account_id = ?";
 		return jdbcTemplate.queryForObject(sqlGetName, String.class, accountId);
@@ -110,9 +112,10 @@ public class RequestSqlDAO implements RequestDAO {
 	
 	private Request mapRowToRequest(SqlRowSet results) {
 		Request request = new Request();
-		request.setTransferId(results.getLong("transfer_id"));
-		request.setAccountTo(getName(results.getLong("account_to")));
-		request.setAmount(results.getBigDecimal("amount"));
+		request.setTransferId(Long.valueOf(results.getString("transfer_id")));
+		Long accountId = Long.valueOf(results.getString("account_to"));
+		request.setAccountTo(getName(accountId));
+		request.setAmount(new BigDecimal(results.getString("amount")));
 		return request;
 	}
 
