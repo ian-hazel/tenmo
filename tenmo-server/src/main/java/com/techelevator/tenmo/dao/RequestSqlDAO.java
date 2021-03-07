@@ -28,15 +28,10 @@ public class RequestSqlDAO implements RequestDAO {
 		String sqlGetAllRequests = "SELECT t.transfer_id, t.account_to, t.amount "
 				+ "FROM transfers t JOIN accounts a ON t.account_from = a.account_id "
 				+ "WHERE t.transfer_status_id = 1 AND a.account_id = ?";
-		Long accountId = getAccountId(principal);
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequests, Request.class, accountId);
-		if(results == null) {
-			return requests;
-		} else {
-			while (results.next()) {
-				Request request = mapRowToRequest(results);
-				requests.add(request);
-			}
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllRequests, Request.class, getAccountId(principal));
+		while (results.next()) {
+			Request request = mapRowToRequest(results);
+			requests.add(request);
 		}
 		return requests;
 	}

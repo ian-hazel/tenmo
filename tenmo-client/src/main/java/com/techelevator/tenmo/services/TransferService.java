@@ -14,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -42,7 +43,7 @@ public class TransferService {
 		toSend.setType(Transfer.Type.SEND);
 		toSend.setStatus(Transfer.Status.APPROVED);
 		
-		String url = BASE_URL + "/transfers";		
+		String url = BASE_URL + "transfers/send";
 		Transfer confirmed = null;
 		
 		try {
@@ -55,6 +56,19 @@ public class TransferService {
 		return confirmed;
 	}
 	
+	public User[] getAllUsers(AuthenticatedUser user) {
+		User[] allUsers = null;
+		String url = BASE_URL + "transfers/";
+		
+		try {
+			allUsers = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), User[].class).getBody();
+		}
+		catch (RestClientResponseException ex) {
+            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+		}
+		return allUsers;
+	}
+	
 	/**
 	 * Creates a new request transfer to ask for money 
 	 * from one account to the user's
@@ -64,14 +78,27 @@ public class TransferService {
 	 * @param user, amount, requestedAcct
 	 * @return new requested transfer
 	 */
-	public Transfer requestTransfer(AuthenticatedUser user, BigDecimal amount, Account requestedAcct) {
+	public Transfer requestTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user, Principal principal) {
 		
+		Transfer toSend = makeBasicTransfer(amount, userToId, principal);
+		toSend.setType(Transfer.Type.REQUEST);
+		toSend.setStatus(Transfer.Status.PENDING);
+		
+		String url = BASE_URL + "transfers/request";
+		Transfer confirmed = null;
+		
+		try {
+			confirmed = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), Transfer.class);		
+		}
+		catch (RestClientResponseException e) {
+			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
+		}
+		
+		return confirmed;
 		// TODO: need to get the authenticated user's acct
 		//Transfer requestTransfer = makeBasicTransfer(amount, get_user_acct, requestedAcct);
 		//requestTransfer.setType(Transfer.Type.REQUEST);
 		//requestTransfer.setStatus(Transfer.Status.PENDING);
-		
-		return null;
 	}
 	
 	public Transfer[] getTransferHistory(Principal principal, AuthenticatedUser user) {
@@ -119,7 +146,7 @@ public class TransferService {
 	
 	/**
 	 * Checks list of pending requests from database
-	 * @param user 
+	 * @param user
 	 * @return pendingRequests
 	 */
 	public Integer approveOrRejectRequest(Request request, int userChoice, AuthenticatedUser user, Principal principal) {
@@ -139,7 +166,7 @@ public class TransferService {
 		}
 		catch (RestClientResponseException ex) {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
-		}		
+		}
 		return userChoice;
 	}
 	
@@ -153,8 +180,6 @@ public class TransferService {
 		
 		return newTransfer;
 	}
-	
-	
 	
 	private HttpEntity makeAuthEntity(String token) {
 		HttpHeaders headers = new HttpHeaders();
