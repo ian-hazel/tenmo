@@ -43,10 +43,10 @@ public class TransferController {
 	
 	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(value = "transfers/send", method = RequestMethod.POST)
-	public void sendTransfer(BigDecimal amount, Long userToId, Principal principal) 
+	public Transfer sendTransfer(Transfer transfer, Principal principal) 
 			throws AccountNotFoundException {
 		try {
-			transferDao.sendMoney(amount, userToId, principal);
+			transferDao.sendMoney(transfer.getAmount(), transfer.getAccountTo(), principal);
 		} catch (AccountNotFoundException e) {
 		}
 	}

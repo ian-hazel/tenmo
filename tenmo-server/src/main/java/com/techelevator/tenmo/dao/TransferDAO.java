@@ -14,7 +14,7 @@ public interface TransferDAO {
 	
 	Transfer getTransferDetails(Long transferId, Principal principal) throws TransferNotFoundException;
 
-	void sendMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
+	Transfer sendMoney(Transfer transfer, Principal principal) throws AccountNotFoundException;
 	
 	void requestMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
 	

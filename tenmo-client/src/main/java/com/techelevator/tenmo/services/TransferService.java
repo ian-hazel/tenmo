@@ -27,7 +27,8 @@ public class TransferService {
 		try {
 			allUsers = restTemplate.exchange(BASE_URL + "transfers/send", HttpMethod.GET, makeAuthEntity(user.getToken()), User[].class)
 					.getBody();
-		} catch (RestClientResponseException ex) {
+		}
+		catch (RestClientResponseException ex) {
 			System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
 		}
 		return allUsers;
@@ -38,7 +39,8 @@ public class TransferService {
 		try {
 			allUsers = restTemplate.exchange(BASE_URL + "transfers/request", HttpMethod.GET, makeAuthEntity(user.getToken()), User[].class)
 					.getBody();
-		} catch (RestClientResponseException ex) {
+		}
+		catch (RestClientResponseException ex) {
 			System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
 		}
 		return allUsers;
@@ -52,13 +54,15 @@ public class TransferService {
 	 * @param user, amount, receivingAcct
 	 * @return new sent transfer
 	 */
-	public void sendTransfer(Long userToId, BigDecimal amount, AuthenticatedUser user) {
+	public Transfer sendTransfer(Long userToId, BigDecimal amount, AuthenticatedUser user) {
 		Transfer sendTransfer = makeBasicTransfer(userToId, amount);
 		try {
 			sendTransfer = restTemplate.postForObject(BASE_URL + "transfers/send", makeTransferEntity(sendTransfer, user.getToken()), Transfer.class);
-		} catch (RestClientResponseException e) {
+		}
+		catch (RestClientResponseException e) {
 			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
 		}
+		return sendTransfer;
 	}
 
 	/**
@@ -69,13 +73,15 @@ public class TransferService {
 	 * @param user, amount, requestedAcct
 	 * @return new requested transfer
 	 */
-	public void requestTransfer(Long userToId, BigDecimal amount,  AuthenticatedUser user) {
+	public Transfer requestTransfer(Long userToId, BigDecimal amount,  AuthenticatedUser user) {
 		Transfer requestTransfer = makeBasicTransfer(userToId, amount);
 		try {
 			requestTransfer = restTemplate.postForObject(BASE_URL + "transfers/request", makeTransferEntity(requestTransfer, user.getToken()), Transfer.class);
-		} catch (RestClientResponseException e) {
+		}
+		catch (RestClientResponseException e) {
 			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
 		}
+		return requestTransfer;
 	}
 
 	public Transfer[] getTransferHistory(AuthenticatedUser user) {
@@ -83,7 +89,8 @@ public class TransferService {
 		try {
 			transferHistory = restTemplate
 					.exchange(BASE_URL + "transfers/details", HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer[].class).getBody();
-		} catch (RestClientResponseException ex) {
+		}
+		catch (RestClientResponseException ex) {
 			System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
 		}
 		return transferHistory;
@@ -95,7 +102,8 @@ public class TransferService {
 		try {
 			thisTransfer = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer.class)
 					.getBody();
-		} catch (RestClientResponseException ex) {
+		}
+		catch (RestClientResponseException ex) {
 			System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
 		}
 		return thisTransfer;
