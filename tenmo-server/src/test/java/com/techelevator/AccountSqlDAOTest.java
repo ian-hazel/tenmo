@@ -24,15 +24,34 @@ public class AccountSqlDAOTest extends BaseSqlDAOTest {
 		user.create("Test2", "word");
 	}
 	
-	@Test
-	public void test_get_balance_works_correctly() {
-//		Assert.assertEquals(new BigDecimal("1000.00"), account.getBalance("Test1"));
-//		Assert.assertEquals(new BigDecimal("1000.00"), account.getBalance("Test2"));
+	@Test 
+	public void test_account_id_match_from_separate_query_searches() {
+		Long account1 = account.getAcctIdFromUserName("Test1");
+		Long account2 = account.getAcctIdFromUserName("Test2");
+		Assert.assertEquals(account1, account.getAcctIdFromUserId(account1)); //these will match because the database syncs the user & 
+		Assert.assertEquals(account2, account.getAcctIdFromUserId(account2)); //account id in order by unintentional design for now
 	}
 	
 	
 	
+	@Test
+	public void test_get_balance_works_correctly() {
+		Long account1 = account.getAcctIdFromUserName("Test1");
+		Long account2 = account.getAcctIdFromUserName("Test2");
+		Assert.assertEquals(new BigDecimal("1000.00"), account.getBalance(account1));
+		Assert.assertEquals(new BigDecimal("1000.00"), account.getBalance(account2));
+	}
 	
+	@Test
+	public void test_increase_balance_works_correctly() {
+		account.increaseBalance(account.getAcctIdFromUserName("Test1"), new BigDecimal(1000));
+		Assert.assertEquals(new BigDecimal("2000.00"), account.getBalance(account.getAcctIdFromUserName("Test1")));
+	}
 	
-	
+	@Test
+	public void test_decrease_balance_works_correctly() {
+		account.decreaseBalance(account.getAcctIdFromUserName("Test1"), new BigDecimal(500));
+		Assert.assertEquals(new BigDecimal("500.00"), account.getBalance(account.getAcctIdFromUserName("Test1")));
+	}
+		
 }
