@@ -58,7 +58,7 @@ public class TransferService {
 	
 	public User[] getAllUsers(AuthenticatedUser user) {
 		User[] allUsers = null;
-		String url = BASE_URL + "transfers/";
+		String url = BASE_URL + "/transfers/userlist";
 		
 		try {
 			allUsers = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), User[].class).getBody();

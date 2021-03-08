@@ -3,11 +3,15 @@ package com.techelevator.tenmo.dao;
 import java.math.BigDecimal;
 
 public interface AccountDAO {
+	
+	Long getAcctIdFromUserId(Long userId);
 
-	BigDecimal getBalance(String username);
+	Long getAcctIdFromUserName(String username);
+
+	BigDecimal getBalance(Long accountId);
 	
-	// TODO: implement change balance method
+	BigDecimal increaseBalance(Long accountId, BigDecimal amount);
 	
-	// TODO: implement accountDao in transfer controller
-		
+	BigDecimal decreaseBalance(Long accountId, BigDecimal amount);
+
 }
