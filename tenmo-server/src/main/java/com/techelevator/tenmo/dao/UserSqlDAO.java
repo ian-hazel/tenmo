@@ -50,6 +50,16 @@ public class UserSqlDAO implements UserDAO {
         }
         throw new UsernameNotFoundException("User " + username + " was not found.");
     }
+    
+    @Override
+    public User findByUserId(Long userId) {
+    	for (User user: this.findAll()) {
+    		if (user.getId() == userId) {
+    			return user;
+    		}
+    	}
+    	return null;
+    }
 
     @Override
     public boolean create(String username, String password) {
@@ -87,4 +97,5 @@ public class UserSqlDAO implements UserDAO {
         user.setAuthorities("ROLE_USER");
         return user;
     }
+
 }
