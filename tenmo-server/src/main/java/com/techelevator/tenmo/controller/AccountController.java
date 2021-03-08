@@ -24,7 +24,7 @@ public class AccountController {
 	@RequestMapping(value = "/balance", method = RequestMethod.GET)
 	public BigDecimal getBalance(Principal principal) {
 		// TODO: update to AuthenticatedUser or pass id or something
-		return accountDao.getBalance(getAcctIdFromUserName(principal.getName()));
+		return accountDao.getBalance(accountDao.getAcctIdFromUserName(principal.getName()));
 	}
 
 }
