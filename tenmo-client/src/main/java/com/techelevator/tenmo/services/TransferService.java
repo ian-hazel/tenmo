@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.techelevator.tenmo.models.Account;
 import com.techelevator.tenmo.models.AuthenticatedUser;
-import com.techelevator.tenmo.models.Request;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 

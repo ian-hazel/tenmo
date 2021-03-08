@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Scanner;
 
-import com.techelevator.tenmo.models.Request;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 
@@ -137,35 +136,35 @@ public class ConsoleService {
 //		}	
 //	}
 	
-	public Long requestsMenu(Request[] requests) {
-		out.println("=====================================");
-		out.println("Transfers                            ");
-		out.println("ID        To                   Amount");
-		out.println("=====================================");
-		if(requests == null) {
-			out.println("You have no pending requests.");
-			out.flush();
-			return Long.valueOf(0);
-		} else {
-			for(Request request : requests) {
-				out.println(String.format("%-10s", request.getTransferId()) + String.format("%-20s", request.getUsername())
-				+ String.format("%7s", NumberFormat.getCurrencyInstance().format(request.getAmount())));
-			}
-			out.println("=====================================");
-			out.print(System.lineSeparator() + "Please enter transfer ID to approve/reject (0 to cancel): ");
-			Long result = null;
-			do {
-				out.flush();
-				String userInput = in.nextLine();
-				try {
-					result = Long.parseLong(userInput);
-				} catch(NumberFormatException e) {
-					out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
-				}
-			} while(result == null);
-			return result;
-		}
-	}
+//	public Long requestsMenu(Request[] requests) {
+//		out.println("=====================================");
+//		out.println("Transfers                            ");
+//		out.println("ID        To                   Amount");
+//		out.println("=====================================");
+//		if(requests == null) {
+//			out.println("You have no pending requests.");
+//			out.flush();
+//			return Long.valueOf(0);
+//		} else {
+//			for(Request request : requests) {
+//				out.println(String.format("%-10s", request.getTransferId()) + String.format("%-20s", request.getUsername())
+//				+ String.format("%7s", NumberFormat.getCurrencyInstance().format(request.getAmount())));
+//			}
+//			out.println("=====================================");
+//			out.print(System.lineSeparator() + "Please enter transfer ID to approve/reject (0 to cancel): ");
+//			Long result = null;
+//			do {
+//				out.flush();
+//				String userInput = in.nextLine();
+//				try {
+//					result = Long.parseLong(userInput);
+//				} catch(NumberFormatException e) {
+//					out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
+//				}
+//			} while(result == null);
+//			return result;
+//		}
+//	}
 	
 	public BigDecimal getTransferAmount() {
 		BigDecimal amount = null;
