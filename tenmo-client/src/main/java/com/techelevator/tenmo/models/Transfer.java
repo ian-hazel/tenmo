@@ -7,7 +7,7 @@ public class Transfer {
 	private Long transferId;
 	private String fromName;
 	private String toName;
-	private Long userId;	
+	private Long userId;
 	private BigDecimal amount;
 	private String type;
 	private String status;

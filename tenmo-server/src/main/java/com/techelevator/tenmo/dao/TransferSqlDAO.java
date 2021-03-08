@@ -35,10 +35,10 @@ public class TransferSqlDAO implements TransferDAO {
 	}
 
 	@Override
-	public void sendMoney(BigDecimal amount, Long userToId, Principal principal) {
+	public Transfer sendMoney(Transfer transfer, Principal principal) {
 		Long accountFromId = getAccountFromId(principal);
-		Long accountToId = getAccountToId(userToId);
-		if (checkBalance(amount, principal)) {
+		Long accountToId = getAccountToId(transfer.getAccountTo());
+		if (checkBalance(transfer.getAmount(), principal)) {
 			String sqlUpdateSender = "UPDATE accounts SET balance = balance - ? WHERE account_id = ?";
 			try {
 				jdbcTemplate.update(sqlUpdateSender, amount, accountFromId);
