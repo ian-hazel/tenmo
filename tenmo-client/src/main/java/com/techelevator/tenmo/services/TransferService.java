@@ -142,7 +142,6 @@ public class TransferService {
 	 * @return pendingRequests
 	 */
 	public Transfer[] getPendingRequests(AuthenticatedUser user) {
-		// TODO update to Transfers
 		
 		Transfer[] pendingRequests = null;
 		
@@ -154,11 +153,59 @@ public class TransferService {
 		return pendingRequests;
 	}
 	
+	public String approveRequest(Transfer transfer, AuthenticatedUser user) {
+		
+		String url = BASE_URL + "/transfers/pendingrequests/" + transfer.getTransferId() + "/approve";
+		String outcome = null;
+		
+		try {
+			outcome = restTemplate.exchange(url, HttpMethod.PUT, makeTransferEntity(transfer, user.getToken()), String.class).getBody();
+		}
+		catch (RestClientResponseException e) {
+			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
+		}
+		return outcome;
+	}
+	
+	public String rejectRequest(Transfer transfer, AuthenticatedUser user) {
+		String url = BASE_URL + "/transfers/pendingrequests/" + transfer.getTransferId() + "/reject";
+		String outcome = null;
+	
+		try {
+			outcome = restTemplate.exchange(url, HttpMethod.PUT, makeTransferEntity(transfer, user.getToken()), String.class).getBody();
+		}
+		catch (RestClientResponseException e) {
+			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
+		}
+		return outcome;	
+	}
+	/*
+	public String sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
+		
+		Transfer toSend = makeBasicTransfer(amount, userToId, user);
+		toSend.setType(Transfer.Type.SEND);
+		toSend.setStatus(Transfer.Status.APPROVED);
+		
+		String url = BASE_URL + "/transfers/send";
+		String status = null;
+		
+		try {
+			status = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), String.class);
+		}
+		catch (RestClientResponseException e) {
+			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
+		}
+		
+		return status;
+	}
+	*/ // TODO: remove this after approveRequest complete, only as example
+	
 	/**
 	 * Checks list of pending requests from database
 	 * @param user
 	 * @return pendingRequests
 	 */
+	/*
 	public Integer approveOrRejectRequest(Request request, int userChoice, AuthenticatedUser user, Principal principal) {
 		if (userChoice != 1 || userChoice != 2) {
 			return null;
@@ -179,6 +226,7 @@ public class TransferService {
 		}
 		return userChoice;
 	}
+	*/
 	
 	
 	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {

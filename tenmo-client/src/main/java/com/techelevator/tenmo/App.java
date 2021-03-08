@@ -100,16 +100,13 @@ private static final String API_BASE_URL = "http://localhost:8080";
 			}
 			else {
 				System.out.println(transfer.getTransferId() + "          "
-								+ "From:  " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername()
+								+ "From:  " + transferService.getUserById(transfer.getUserFromId(),currentUser).getUsername()
 								+ "                 " + transfer.getAmount());
 			}
-		// TODO: get print line working, needs from/to definition and the transfer name
-			//	System.out.println(transfer.getTransferId() + "        " + transfer.getType()) + transfer.get "                   " + NumberFormat.getCurrencyInstance().format(transfer.getAmount());
 		}
 		System.out.println("---------");
 		Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
 		if (transferId != 0) {
-			// TODO: run the transfer detail method
 			System.out.println("---------------------------------------------");
 			System.out.println("Transfer Details");
 			System.out.println("---------------------------------------------");
@@ -123,7 +120,7 @@ private static final String API_BASE_URL = "http://localhost:8080";
 		}
 	}
 	
-	// TODO: implement viewTransferDetails -- USE CASE 6 in readme
+	// STUB could be implemented into above method
 	private void viewTransferDetails() {
 		System.out.println("---------------------------------------------");
 		System.out.println("Transfer Details");
@@ -138,18 +135,37 @@ private static final String API_BASE_URL = "http://localhost:8080";
 		System.out.println("Pending Transfer                             ");
 		System.out.println("ID          To                   Amount      ");
 		System.out.println("---------------------------------------------");
-		Request[] pendingRequests = transferService.getPendingRequests(currentUser);
-		for (Request pending : pendingRequests) {
-			System.out.println(pending.getTransferId() + "    " + pending.getUsername() + "           " + pending.getAmount());
+		Transfer[] pendingRequests = transferService.getPendingRequests(currentUser);
+		for (Transfer pending : pendingRequests) {
+			System.out.println(pending.getTransferId() + "           " + transferService.getUserById(pending.getUserFromId(),currentUser).getUsername() + "           " + pending.getAmount());
 		}
 		System.out.println("----------");
-		Long userToId = (long)console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel):");
-		// TODO: run approveOrRejectRequest
+		Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel):");
+		
+		if (transferId != 0) {
+			approveOrRejectRequest(transferId);
+		}
 	}
 	
-	private void approveOrRejectRequest() {
-		// TODO: case 9 in readme, pass int with 1 or 2, object, principal
-		
+	private void approveOrRejectRequest(Long transferId) {
+		System.out.println("1: Approve");
+		System.out.println("2: Reject");
+		System.out.println("0: Don't approve or reject");
+		System.out.println("----------");
+		int userSelection = console.getUserInputInteger("Please choose an option:");
+		// TODO: if user chooses an option beyond 1, 2, 0 will program crash?
+		if (userSelection == 1) {
+			// TODO: needs to update request to approved and try to transfer funds
+			String outcome = transferService.approveRequest(transferService.getTransferDetails(currentUser, transferId), currentUser);
+			System.out.println(outcome);
+		}
+		else if (userSelection == 2) {
+			String outcome = transferService.rejectRequest(transferService.getTransferDetails(currentUser, transferId), currentUser);
+			System.out.println(outcome);
+		}
+		else if (userSelection != 0) {
+			System.out.println("Invalid input!");
+		}
 	}
 
 	private void sendBucks() {
