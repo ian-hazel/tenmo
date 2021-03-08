@@ -43,7 +43,7 @@ public class TransferController {
 		if (acctDao.getBalance(transfer.getUserFromId()).compareTo(transfer.getAmount()) > 0) {
 			acctDao.decreaseBalance(transfer.getUserFromId(), transfer.getAmount());
 			acctDao.increaseBalance(transfer.getUserToId(), transfer.getAmount());
-			int results = transferDao.sendCash(transfer);
+			int results = transferDao.sendMoney(transfer);
 			if (results == 1) {
 				response = "Transfer Approved";
 			}
@@ -53,6 +53,24 @@ public class TransferController {
 		}
 		else {
 			response = "Insufficient Funds";
+		}
+		return response;
+	}
+	
+	@RequestMapping( path = "/request" , method = RequestMethod.POST)
+	public String requestTransfer(@Valid @RequestBody Transfer transfer) {
+		// TODO: finish method
+		String response = "";
+		if (transfer.getUserToId() == transfer.getUserFromId()) {
+			response = "You can't request money from yourself!";
+			return response;
+		}
+		int results = transferDao.requestMoney(transfer);
+		if (results == 1) {
+			response = "Request Sent";
+		}
+		else {
+			response = "Request Failed";
 		}
 		return response;
 	}
@@ -75,6 +93,11 @@ public class TransferController {
 	@RequestMapping( path = "/userlist/{id}" , method = RequestMethod.GET)
 	public User getUserById(@PathVariable long id) {
 		return userDao.findByUserId(id);
+	}
+	
+	@RequestMapping( path = "/pendingrequests" , method = RequestMethod.GET)
+	public List<Transfer> getPendingRequests(Principal principal) {
+		return transferDao.getPendingRequests(principal);
 	}
 	
 }

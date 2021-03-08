@@ -23,21 +23,7 @@ public class TransferSqlDAO implements TransferDAO {
 	}
 
 	@Override
-    // TODO: BUG: should not return void
-	public void requestMoney(BigDecimal amount, Long userToId, Principal principal) {
-		Long accountFromId = getAccountFromId(principal);
-		Long accountToId = getAccountToId(userToId);
-		String sqlRequestMoney = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) "
-				+ "VALUES (1, 1, ?, ?, ?) ";
-		try {
-			jdbcTemplate.update(sqlRequestMoney, accountFromId, accountToId, amount);
-		} catch (DataAccessException e) {
-
-		}
-	}
-	
-	@Override
-	public int sendCash(Transfer transfer) throws AccountNotFoundException {
+	public int sendMoney(Transfer transfer) throws AccountNotFoundException {
 		int result = 0;
 		try {
 			result = addTransfer(transfer);
@@ -47,8 +33,18 @@ public class TransferSqlDAO implements TransferDAO {
 		return result;
 	}
 	
-    // TODO: BUG: should take a Transfer, not long.
-	public int addTransfer(Transfer transfer) {
+	@Override
+	public int requestMoney(Transfer transfer) throws AccountNotFoundException {
+		int result = 0;
+		try {
+			result = addTransfer(transfer);
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+	
+	private int addTransfer(Transfer transfer) {
 		String sqlAddTransfer = "INSERT INTO transfers (transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount)"
 				+ "VALUES (DEFAULT, ?, ? , ?, ?, ?)";
 		int result = 0;
@@ -58,29 +54,6 @@ public class TransferSqlDAO implements TransferDAO {
 		catch (DataAccessException e) {
 		}
 		return result;
-	}
-	
-
-	@Override
-    // TODO: BUG: should not return void
-	public void sendMoney(BigDecimal amount, Long userToId, Principal principal) {
-		Long accountFromId = getAccountFromId(principal);
-		Long accountToId = getAccountToId(userToId);
-		if (checkBalance(amount, principal)) {
-			String sqlUpdateSender = "UPDATE accounts SET balance = balance - ? WHERE account_id = ?";
-			try {
-				jdbcTemplate.update(sqlUpdateSender, amount, accountFromId);
-			} catch (DataAccessException e) {
-			}
-			String sqlUpdateReceiver = "UPDATE accounts SET balance = balance + ? WHERE account_id = ?";
-			try {
-				jdbcTemplate.update(sqlUpdateReceiver, amount, accountToId);
-			} catch (DataAccessException e) {
-			}
-			insertTransfers(Long.valueOf(2), accountFromId, accountToId, amount);
-		} else {
-			insertTransfers(Long.valueOf(3), accountFromId, accountToId, amount);
-		}
 	}
 
 	@Override
@@ -96,7 +69,23 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return transfers;
 	}
-
+	
+	@Override
+	public List<Transfer> getPendingRequests(Principal principal) {
+		List<Transfer> requests = new ArrayList<>();
+		String sqlGetPendingRequests = "SELECT transfer_id, transfer_type_id, "
+										+ "transfer_status_id, account_from, "
+										+ "account_to, amount "
+										+ "FROM transfers WHERE account_to = ? "
+										+ "AND transfer_type_id = ? "
+										+ "AND transfer_status_id = ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetPendingRequests, getAccountFromId(principal), Transfer.Type.valueOf("Request"), Transfer.Status.valueOf("Pending"));
+		while(results.next()){
+			Transfer transfer = mapRowToTransfer(results);
+			requests.add(transfer);
+		}
+		return requests;
+	}
 
 	@Override
 	public Transfer getTransferDetails(Long transferId) {
@@ -111,42 +100,15 @@ public class TransferSqlDAO implements TransferDAO {
 		return transfer;
 	}
 
-	private boolean checkBalance(BigDecimal amount, Principal principal) {
-		BigDecimal balance = jdbcTemplate.queryForObject("SELECT balance FROM accounts "
-				+"JOIN users USING(user_id) WHERE username = ?", BigDecimal.class, principal.getName());
-		if (balance.compareTo(amount) > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	
-	public String getUsername(Long userId) {
-		String sqlGetName = "SELECT username FROM users WHERE user_id = ?";
-		return jdbcTemplate.queryForObject(sqlGetName, String.class, userId);
-	}
-
 	private Long getAccountFromId(Principal principal) {
 		Long accountFromId = jdbcTemplate.queryForObject("SELECT account_id FROM accounts "
 				+ "JOIN users USING(user_id) WHERE username = ?", Long.class, principal.getName());
 		return accountFromId;
 	}
 
-    // TODO: BUG: should take a Transfer, not long.
 	private Long getAccountToId(Long userToId) {
 		Long accountToId = jdbcTemplate.queryForObject("SELECT account_id FROM accounts WHERE user_id = ?", Long.class, userToId);
 		return accountToId;
-	}
-
-    // TODO: BUG: should take a Transfer, not long.
-	private void insertTransfers(Long status, Long accountFromId, Long accountToId, BigDecimal amount) {
-		String sqlSendMoney = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) "
-				+ "VALUES (2, ? , ?, ?, ?)";
-		try {
-			jdbcTemplate.update(sqlSendMoney, status, accountFromId, accountToId, amount);
-		} catch (DataAccessException e) {
-		}
 	}
 
 	private Transfer mapRowToTransfer(SqlRowSet results) {
@@ -158,23 +120,73 @@ public class TransferSqlDAO implements TransferDAO {
 		transfer.setUserToId(results.getLong("account_to"));
 		transfer.setAmount(results.getBigDecimal("amount"));
 		return transfer;
-		/*
-		Long type = results.getLong("transfer_type_id");
-		if(type == 1) {
-			transfer.setType("Request");
-		} else {
-			transfer.setType("Send");
-		}
-		Long status = results.getLong("transfer_status_id");
-		if(status == 1) {
-			transfer.setStatus("Pending");
-		} else if(status == 2) {
-			transfer.setStatus("Approved");
-		} else {
-			transfer.setStatus("Rejected");
-		}
-		*/
 	}
-	//TODO return to this method
-
 }
+
+
+/*
+	@Override
+	public void requestMoney(BigDecimal amount, Long userToId, Principal principal) {
+		Long accountFromId = getAccountFromId(principal);
+		Long accountToId = getAccountToId(userToId);
+		String sqlRequestMoney = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) "
+				+ "VALUES (1, 1, ?, ?, ?) ";
+		try {
+			jdbcTemplate.update(sqlRequestMoney, accountFromId, accountToId, amount);
+		} catch (DataAccessException e) {
+
+		}
+	}
+ */
+
+/*
+@Override
+public void sendMoney(BigDecimal amount, Long userToId, Principal principal) {
+	Long accountFromId = getAccountFromId(principal);
+	Long accountToId = getAccountToId(userToId);
+	if (checkBalance(amount, principal)) {
+		String sqlUpdateSender = "UPDATE accounts SET balance = balance - ? WHERE account_id = ?";
+		try {
+			jdbcTemplate.update(sqlUpdateSender, amount, accountFromId);
+		} catch (DataAccessException e) {
+		}
+		String sqlUpdateReceiver = "UPDATE accounts SET balance = balance + ? WHERE account_id = ?";
+		try {
+			jdbcTemplate.update(sqlUpdateReceiver, amount, accountToId);
+		} catch (DataAccessException e) {
+		}
+		insertTransfers(Long.valueOf(2), accountFromId, accountToId, amount);
+	} else {
+		insertTransfers(Long.valueOf(3), accountFromId, accountToId, amount);
+	}
+}
+*/
+
+/*
+	private void insertTransfers(Long status, Long accountFromId, Long accountToId, BigDecimal amount) {
+		String sqlSendMoney = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) "
+				+ "VALUES (2, ? , ?, ?, ?)";
+		try {
+			jdbcTemplate.update(sqlSendMoney, status, accountFromId, accountToId, amount);
+		} catch (DataAccessException e) {
+		}
+	}
+ */
+/*
+	private boolean checkBalance(BigDecimal amount, Principal principal) {
+		BigDecimal balance = jdbcTemplate.queryForObject("SELECT balance FROM accounts "
+				+"JOIN users USING(user_id) WHERE username = ?", BigDecimal.class, principal.getName());
+		if (balance.compareTo(amount) > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+ */
+
+/*
+public String getUsername(Long userId) {
+	String sqlGetName = "SELECT username FROM users WHERE user_id = ?";
+	return jdbcTemplate.queryForObject(sqlGetName, String.class, userId);
+}
+*/

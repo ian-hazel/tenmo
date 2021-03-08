@@ -14,13 +14,13 @@ public interface TransferDAO {
 
 	Transfer getTransferDetails(Long transferId) throws TransferNotFoundException;
 
-	int sendCash(Transfer transfer) throws AccountNotFoundException;
+	int sendMoney(Transfer transfer) throws AccountNotFoundException;
 	
-    // TODO: BUG: should not return void
-	// TODO: takes in Transfer
-	void sendMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
-
-    // TODO: BUG: should not return void
-	void requestMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
+	int requestMoney(Transfer transfer) throws AccountNotFoundException;
+	
+	List<Transfer> getPendingRequests(Principal principal);
 
 }
+
+// void sendMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
+// void requestMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
