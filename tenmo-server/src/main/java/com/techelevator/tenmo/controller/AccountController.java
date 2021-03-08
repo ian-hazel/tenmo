@@ -20,9 +20,11 @@ public class AccountController {
 		this.accountDao = accountDao;
 	}
 
-	@RequestMapping(value = "balance", method = RequestMethod.GET)
+    // TODO: BUG: add back "/" and make it work.
+	@RequestMapping(value = "/balance", method = RequestMethod.GET)
 	public BigDecimal getBalance(Principal principal) {
-		return accountDao.getBalance(principal.getName());
+		// TODO: update to AuthenticatedUser or pass id or something
+		return accountDao.getBalance(accountDao.getAcctIdFromUserName(principal.getName()));
 	}
-
+	
 }
