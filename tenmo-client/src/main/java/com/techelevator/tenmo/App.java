@@ -91,12 +91,14 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		System.out.println("Transfers                                    ");
 		System.out.println("ID            From/To                  Amount");
 		System.out.println("---------------------------------------------");
-		Transfer[] transfers = transferService.getTransferHistory(principal, currentUser);
+		Transfer[] transfers = transferService.getTransferHistory(currentUser);
 		for (Transfer transfer : transfers) {
 		// TODO: get print line working, needs from/to definition and the transfer name
 			//	System.out.println(transfer.getTransferId() + "        " + transfer.getType()) + transfer.get "                   " + NumberFormat.getCurrencyInstance().format(transfer.getAmount());
 		}
 	}
+	
+	// TODO: implement viewTransferDetails -- USE CASE 6 in readme
 
 	private void viewPendingRequests() {
 		//TODO: move formatting/display header to console service/make pretty
