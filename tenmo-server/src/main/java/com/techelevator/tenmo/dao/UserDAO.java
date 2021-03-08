@@ -9,6 +9,8 @@ public interface UserDAO {
     List<User> findAll();
 
     User findByUsername(String username);
+    
+    User findByUserId(Long userId);
 
     // TODO: BUG: should not return void
     int findIdByUsername(String username);
