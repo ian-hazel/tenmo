@@ -79,16 +79,16 @@ public class ConsoleService {
 		return result;
 	}
 	
-	public Long appendRequests() {
-		Long result = null;
+	public Integer appendRequests() {
+		Integer result = null;
 		do {
-			out.print("1: Approve");
-			out.print("2: Reject");
-			out.print("0: Don't Approve or Reject");
+			out.println("1: Approve");
+			out.println("2: Reject");
+			out.println("0: Don't Approve or Reject");
 			out.flush();
 			String userInput = in.nextLine();
 			try {
-				result = Long.parseLong(userInput);
+				result = Integer.parseInt(userInput);
 			} catch(NumberFormatException e) {
 				out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
 			}
