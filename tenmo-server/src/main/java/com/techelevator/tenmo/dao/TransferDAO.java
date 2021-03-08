@@ -12,8 +12,10 @@ public interface TransferDAO {
 
 	List<Transfer> getTransferHistory(Principal principal);
 
-	Transfer getTransferDetails(Long transferId, Principal principal) throws TransferNotFoundException;
+	Transfer getTransferDetails(Long transferId) throws TransferNotFoundException;
 
+	int sendCash(Transfer transfer) throws AccountNotFoundException;
+	
     // TODO: BUG: should not return void
 	// TODO: takes in Transfer
 	void sendMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
