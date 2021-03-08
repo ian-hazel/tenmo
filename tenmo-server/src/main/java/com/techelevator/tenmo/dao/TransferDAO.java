@@ -15,6 +15,7 @@ public interface TransferDAO {
 	Transfer getTransferDetails(Long transferId, Principal principal) throws TransferNotFoundException;
 
     // TODO: BUG: should not return void
+	// TODO: takes in Transfer
 	void sendMoney(BigDecimal amount, Long accountToId, Principal principal) throws AccountNotFoundException;
 
     // TODO: BUG: should not return void
