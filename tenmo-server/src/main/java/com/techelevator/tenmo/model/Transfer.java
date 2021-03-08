@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.models;
+package com.techelevator.tenmo.model;
 
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -9,17 +9,35 @@ public class Transfer {
 	private Long userFromId;
 	private Long userToId;
 	private BigDecimal amount;
-	private Principal principal;
-
-	public enum Type { REQUEST, SEND }
 	private Type type;
-
-    // TODO: BUG: add values here
-	public enum Status { PENDING, APPROVED, REJECTED }
 	private Status status;
-
+	private Principal principal;
+	
+	public enum Type {
+		REQUEST(1),
+		SEND(2);
+		
+		public final int value;
+		
+		private Type(int value) {
+			this.value = value;
+		}
+	}
+	
+	public enum Status {
+		PENDING(1),
+		APPROVED(2),
+		REJECTED(3);
+		
+		public final int value;
+		
+		private Status(int value) {
+			this.value = value;
+		}
+	}
+	
 	public Transfer() {
-
+		
 	}
 	/*
 	public Transfer(BigDecimal amount, Type type, Status status) {
@@ -28,14 +46,14 @@ public class Transfer {
 		this.status = status;
 	}
 	*/
-
+	
 	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
 		this.transferId = transferId;
 		this.userFromId = userFromId;
 		this.userToId = userToId;
 		this.amount = amount;
 		this.type = type;
-		this.status = status;
+		this.status = status;	
 	}
 
 	public Long getTransferId() {
@@ -69,7 +87,7 @@ public class Transfer {
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-
+	
 	public Type getType() {
 		return type;
 	}
@@ -93,5 +111,5 @@ public class Transfer {
 	public void setPrincipal(Principal principal) {
 		this.principal = principal;
 	}
-
+	
 }
