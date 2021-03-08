@@ -65,13 +65,6 @@ public class Transfer {
 	public Transfer() {
 		
 	}
-	/*
-	public Transfer(BigDecimal amount, Type type, Status status) {
-		this.amount = amount;
-		this.type = type;
-		this.status = status;
-	}
-	*/
 	
 	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
 		this.transferId = transferId;
