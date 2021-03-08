@@ -37,23 +37,23 @@ public class TransferService {
 	 * @param user, amount, receivingAcct
 	 * @return new sent transfer
 	 */
-	public Transfer sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
+	public String sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
 		
 		Transfer toSend = makeBasicTransfer(amount, userToId, user);
 		toSend.setType(Transfer.Type.SEND);
 		toSend.setStatus(Transfer.Status.APPROVED);
 		
-		String url = BASE_URL + "transfers/send";
-		Transfer confirmed = null;
+		String url = BASE_URL + "/transfers/send";
+		String status = null;
 		
 		try {
-			confirmed = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), Transfer.class);		
+			status = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), String.class);
 		}
 		catch (RestClientResponseException e) {
 			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
 		}
 		
-		return confirmed;
+		return status;
 	}
 	
 	public User[] getAllUsers(AuthenticatedUser user) {
@@ -67,6 +67,19 @@ public class TransferService {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
 		}
 		return allUsers;
+	}
+	
+	public User getUserById(Long userId, AuthenticatedUser user) {
+		User targetUser = null;
+		String url = BASE_URL + "/transfers/userlist/" + userId;
+		
+		try {
+			targetUser = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), User.class).getBody();
+		}
+		catch (RestClientResponseException ex) {
+            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
+		}
+		return targetUser;
 	}
 	
 	/**
@@ -103,7 +116,7 @@ public class TransferService {
 	
 	public Transfer[] getTransferHistory(AuthenticatedUser user) {
 		Transfer[] transferHistory = null;
-		String url = BASE_URL + "transfers/";
+		String url = BASE_URL + "/transfers";
 		
 		try {
 			transferHistory = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer[].class).getBody();
@@ -116,7 +129,7 @@ public class TransferService {
 	
 	public Transfer getTransferDetails(AuthenticatedUser user, Long transferId) {
 		Transfer thisTransfer = null;
-		String url = BASE_URL + "transfers/" + transferId;
+		String url = BASE_URL + "/transfers/" + transferId;
 		
 		try {
 			thisTransfer = restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer.class).getBody();
