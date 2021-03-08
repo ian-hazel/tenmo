@@ -131,19 +131,25 @@ private static final String API_BASE_URL = "http://localhost:8080";
 
 	private void viewPendingRequests() {
 		//TODO: move formatting/display header to console service/make pretty
-		System.out.println("---------------------------------------------");
-		System.out.println("Pending Transfer                             ");
-		System.out.println("ID          To                   Amount      ");
-		System.out.println("---------------------------------------------");
 		Transfer[] pendingRequests = transferService.getPendingRequests(currentUser);
-		for (Transfer pending : pendingRequests) {
-			System.out.println(pending.getTransferId() + "           " + transferService.getUserById(pending.getUserFromId(),currentUser).getUsername() + "           " + pending.getAmount());
+		if (pendingRequests.length != 0) {
+			System.out.println("---------------------------------------------");
+			System.out.println("Pending Transfer                             ");
+			System.out.println("ID          To                   Amount      ");
+			System.out.println("---------------------------------------------");
+			
+			for (Transfer pending : pendingRequests) {
+				System.out.println(pending.getTransferId() + "           " + transferService.getUserById(pending.getUserFromId(),currentUser).getUsername() + "           " + pending.getAmount());
+			}
+			System.out.println("----------");
+			Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel):");
+			
+			if (transferId != 0) {
+				approveOrRejectRequest(transferId);		
+			}
 		}
-		System.out.println("----------");
-		Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel):");
-		
-		if (transferId != 0) {
-			approveOrRejectRequest(transferId);
+		else {
+			System.out.println("No pending requests!");
 		}
 	}
 	
