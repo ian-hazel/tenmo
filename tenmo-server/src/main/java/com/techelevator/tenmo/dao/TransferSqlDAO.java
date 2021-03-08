@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.exceptions.AccountNotFoundException;
+import com.techelevator.tenmo.model.exceptions.TransferNotFoundException;
 
 @Component
 public class TransferSqlDAO implements TransferDAO {
@@ -79,7 +80,7 @@ public class TransferSqlDAO implements TransferDAO {
 										+ "FROM transfers WHERE account_to = ? "
 										+ "AND transfer_type_id = ? "
 										+ "AND transfer_status_id = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetPendingRequests, getAccountFromId(principal), Transfer.Type.valueOf("Request"), Transfer.Status.valueOf("Pending"));
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetPendingRequests, getAccountFromId(principal), Transfer.Type.REQUEST.getValue(), Transfer.Status.PENDING.getValue());
 		while(results.next()){
 			Transfer transfer = mapRowToTransfer(results);
 			requests.add(transfer);
@@ -99,6 +100,58 @@ public class TransferSqlDAO implements TransferDAO {
 		}
 		return transfer;
 	}
+	
+	@Override
+	public int approveRequest(Transfer transfer) throws TransferNotFoundException {
+		int result = 0;
+		try {
+			result = approveHelper(transfer);
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+	
+	private int approveHelper(Transfer transfer) throws TransferNotFoundException {
+		int result = 0;
+		String sqlUpdateApprove = "UPDATE transfers "
+								+ "SET transfer_status_id = ?"
+								+ "WHERE transfer_id = ?";
+		try {
+			result = jdbcTemplate.update(sqlUpdateApprove, Transfer.Status.APPROVED.getValue(), transfer.getTransferId());
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+
+	@Override
+	public int rejectRequest(Transfer transfer) throws TransferNotFoundException {
+		int result = 0;
+		String sqlUpdateApprove = "UPDATE transfers "
+				+ "SET transfer_status_id = ?"
+				+ "WHERE transfer_id = ?";
+		try {
+			result = jdbcTemplate.update(sqlUpdateApprove, Transfer.Status.REJECTED.getValue(), transfer.getTransferId());
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+	/*// TODO: delete, not needed?
+	private int rejectHelper(Transfer transfer, Long transferId) throws TransferNotFoundException {
+		int result = 0;
+		String sqlUpdateApprove = "UPDATE transfers "
+				+ "SET transfer_status_id = ?"
+				+ "WHERE transfer_id = ?";
+		try {
+			result = jdbcTemplate.update(sqlUpdateApprove, Transfer.Type.valueOf("Rejected"), transferId);
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+	*/
 
 	private Long getAccountFromId(Principal principal) {
 		Long accountFromId = jdbcTemplate.queryForObject("SELECT account_id FROM accounts "

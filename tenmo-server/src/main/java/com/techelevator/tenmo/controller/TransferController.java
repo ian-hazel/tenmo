@@ -100,4 +100,38 @@ public class TransferController {
 		return transferDao.getPendingRequests(principal);
 	}
 	
+	@RequestMapping( path = "/pendingrequests/{id}/approve" , method = RequestMethod.PUT)
+	public String approveRequest(@Valid @RequestBody Transfer transfer, @PathVariable long id) {
+		String response = "";
+		int updateCheck = 0;
+		if (acctDao.getBalance(transfer.getUserFromId()).compareTo(transfer.getAmount()) > 0) {
+			updateCheck = transferDao.approveRequest(transfer);
+			if (updateCheck == 1) {
+				acctDao.decreaseBalance(transfer.getUserFromId(), transfer.getAmount());
+				acctDao.increaseBalance(transfer.getUserToId(), transfer.getAmount());
+				response = "Approval successful, transfer complete";
+			}
+			else {
+				response = "Approval failed";
+			}
+		}
+		else {
+			response = "Insufficient funds to approve request";
+		}
+		return response;
+	}
+	
+	@RequestMapping ( path = "/pendingrequests/{id}/reject", method = RequestMethod.PUT)
+	public String rejectRequest(@Valid @RequestBody Transfer transfer, @PathVariable long id) {
+		String response = "";
+		int updateCheck = 0;
+		updateCheck = transferDao.rejectRequest(transfer);
+		if (updateCheck == 1) {
+			response = "Rejection successful";
+		}
+		else {
+			response = "Rejection failed";
+		}
+		return response;
+	}
 }

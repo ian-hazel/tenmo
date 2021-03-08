@@ -19,6 +19,10 @@ public interface TransferDAO {
 	int requestMoney(Transfer transfer) throws AccountNotFoundException;
 	
 	List<Transfer> getPendingRequests(Principal principal);
+	
+	int approveRequest(Transfer transfer) throws TransferNotFoundException;
+	
+	int rejectRequest(Transfer transfer) throws TransferNotFoundException;
 
 }
 
