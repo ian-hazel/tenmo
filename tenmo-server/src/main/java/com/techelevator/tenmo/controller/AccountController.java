@@ -23,6 +23,7 @@ public class AccountController {
     // TODO: BUG: add back "/" and make it work.
 	@RequestMapping(value = "balance", method = RequestMethod.GET)
 	public BigDecimal getBalance(Principal principal) {
+		// TODO: update to AuthenticatedUser or pass id or something
 		return accountDao.getBalance(principal.getName());
 	}
 
