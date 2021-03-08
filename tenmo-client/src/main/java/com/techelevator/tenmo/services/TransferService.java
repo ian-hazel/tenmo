@@ -91,27 +91,23 @@ public class TransferService {
 	 * @param user, amount, requestedAcct
 	 * @return new requested transfer
 	 */
-	public Transfer requestTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
+	public String requestTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
 		
 		Transfer toSend = makeBasicTransfer(amount, userToId, user);
 		toSend.setType(Transfer.Type.REQUEST);
 		toSend.setStatus(Transfer.Status.PENDING);
 		
 		String url = BASE_URL + "transfers/request";
-		Transfer confirmed = null;
+		String status = null;
 		
 		try {
-			confirmed = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), Transfer.class);		
+			status = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), String.class);		
 		}
 		catch (RestClientResponseException e) {
 			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
 		}
 		
-		return confirmed;
-		// TODO: need to get the authenticated user's acct
-		//Transfer requestTransfer = makeBasicTransfer(amount, get_user_acct, requestedAcct);
-		//requestTransfer.setType(Transfer.Type.REQUEST);
-		//requestTransfer.setStatus(Transfer.Status.PENDING);
+		return status;
 	}
 	
 	public Transfer[] getTransferHistory(AuthenticatedUser user) {
@@ -145,13 +141,13 @@ public class TransferService {
 	 * @param user 
 	 * @return pendingRequests
 	 */
-	public Request[] getPendingRequests(AuthenticatedUser user) {
+	public Transfer[] getPendingRequests(AuthenticatedUser user) {
 		// TODO update to Transfers
 		
-		Request[] pendingRequests = null;
+		Transfer[] pendingRequests = null;
 		
 		try {
-        	pendingRequests = restTemplate.exchange(BASE_URL + "requests/", HttpMethod.GET, makeAuthEntity(user.getToken()), Request[].class).getBody();
+        	pendingRequests = restTemplate.exchange(BASE_URL + "/transfers/pendingrequests", HttpMethod.GET, makeAuthEntity(user.getToken()), Transfer[].class).getBody();
         } catch (RestClientResponseException ex) {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
         }
