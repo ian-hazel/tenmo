@@ -26,6 +26,15 @@ public class Transfer {
 		public int getValue() {
 			return value;
 		}
+		
+		public static Type valueOfType(int value) {
+			for (Type t : values()) {
+				if (t.value == value) {
+					return t;
+				}
+			}
+			return null;
+		}
 	}
 	
 	public enum Status {
@@ -41,6 +50,15 @@ public class Transfer {
 		
 		public int getValue() {
 			return value;
+		}
+		
+		public static Status valueOfStatus(int value) {
+			for (Status status : values()) {
+				if (status.value == value) {
+					return status;
+				}
+			}
+			return null;
 		}
 	}
 	
