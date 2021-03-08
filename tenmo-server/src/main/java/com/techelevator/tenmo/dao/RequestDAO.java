@@ -11,8 +11,10 @@ public interface RequestDAO {
 
 	Request getRequestByTransferId(Long transferId, String username) throws TransferNotFoundException;
 
+    // TODO: BUG: should not return void
 	void approveRequest(Long transferId, String username) throws TransferNotFoundException;
 
+    // TODO: BUG: should not return void
 	void rejectRequest(Long transferId) throws TransferNotFoundException;
 
 }

@@ -97,45 +97,45 @@ public class ConsoleService {
 		return result;
 	}
 		
-	public Long printTransferHistory(Transfer[] transfers) {
-		out.println("===================================");
-		out.println("Transfers                          ");
-		out.println("ID       From/To             Amount");
-		out.println("===================================");
-		if(transfers == null) {
-			out.println("You have no transfers in your history.");
-			out.flush();
-			return Long.valueOf(0);
-		} else {
-			for(Transfer transfer : transfers) {
-				Long id = transfer.getTransferId();
-				String type = transfer.getType();
-				String fromName = transfer.getFromName();
-				String toName = transfer.getToName();
-				BigDecimal amount = transfer.getAmount();
-				if(type.equals("Send")) {
-					out.println(String.format("%-10s", id) + String.format("%6s", "To:") + String.format("%-14", toName) 
-					+ String.format("%7s", NumberFormat.getCurrencyInstance().format(amount)));
-				} else {
-					out.println(String.format("%-10s", id) + String.format("%6s", "From:") + String.format("%-14", fromName) 
-					+ String.format("%6s", NumberFormat.getCurrencyInstance().format(amount)));
-				}	
-			}
-			out.println("===================================");
-			out.print(System.lineSeparator() + "Please enter transfer ID to view details (0 to cancel)");
-			Long result = null;
-			do {
-				out.flush();
-				String userInput = in.nextLine();
-				try {
-					result = Long.parseLong(userInput);
-				} catch(NumberFormatException e) {
-					out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
-				}
-			} while(result == null);
-			return result;
-		}	
-	}
+//	public Long printTransferHistory(Transfer[] transfers) {
+//		out.println("===================================");
+//		out.println("Transfers                          ");
+//		out.println("ID       From/To             Amount");
+//		out.println("===================================");
+//		if(transfers == null) {
+//			out.println("You have no transfers in your history.");
+//			out.flush();
+//			return Long.valueOf(0);
+//		} else {
+//			for(Transfer transfer : transfers) {
+//				Long id = transfer.getTransferId();
+//				String type = transfer.getType();
+//				String fromName = transfer.getFromName();
+//				String toName = transfer.getToName();
+//				BigDecimal amount = transfer.getAmount();
+//				if(type.equals("Send")) {
+//					out.println(String.format("%-10s", id) + String.format("%6s", "To:") + String.format("%-14", toName) 
+//					+ String.format("%7s", NumberFormat.getCurrencyInstance().format(amount)));
+//				} else {
+//					out.println(String.format("%-10s", id) + String.format("%6s", "From:") + String.format("%-14", fromName) 
+//					+ String.format("%6s", NumberFormat.getCurrencyInstance().format(amount)));
+//				}	
+//			}
+//			out.println("===================================");
+//			out.print(System.lineSeparator() + "Please enter transfer ID to view details (0 to cancel)");
+//			Long result = null;
+//			do {
+//				out.flush();
+//				String userInput = in.nextLine();
+//				try {
+//					result = Long.parseLong(userInput);
+//				} catch(NumberFormatException e) {
+//					out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
+//				}
+//			} while(result == null);
+//			return result;
+//		}	
+//	}
 	
 	public Long requestsMenu(Request[] requests) {
 		out.println("=====================================");
@@ -226,18 +226,18 @@ public class ConsoleService {
 		return userId;
 	}
 	
-	public void transferDetails(Transfer transfer) {
-		out.println("===================================");
-		out.println("Transfer Details                   ");
-		out.println("===================================");
-		out.println(String.format("%7s", "ID: ") + String.format("%-20", transfer.getTransferId()));
-		out.println(String.format("%7s", "From: ") + String.format("%-20", transfer.getFromName()));
-		out.println(String.format("%7s", "To: ") + String.format("%-20", transfer.getToName()));
-		out.println(String.format("%7s", "Type: ") + String.format("%-20", transfer.getType()));
-		out.println(String.format("%7s", "Status: ") + String.format("%-20", transfer.getStatus()));
-		out.println(String.format("%7s", "Amount: ") + String.format("%-20", transfer.getAmount()));
-		out.flush();
-	}
+//	public void transferDetails(Transfer transfer) {
+//		out.println("===================================");
+//		out.println("Transfer Details                   ");
+//		out.println("===================================");
+//		out.println(String.format("%7s", "ID: ") + String.format("%-20", transfer.getTransferId()));
+//		out.println(String.format("%7s", "From: ") + String.format("%-20", transfer.getFromName()));
+//		out.println(String.format("%7s", "To: ") + String.format("%-20", transfer.getToName()));
+//		out.println(String.format("%7s", "Type: ") + String.format("%-20", transfer.getType()));
+//		out.println(String.format("%7s", "Status: ") + String.format("%-20", transfer.getStatus()));
+//		out.println(String.format("%7s", "Amount: ") + String.format("%-20", transfer.getAmount()));
+//		out.flush();
+//	}
 	
 	public void printBalance(BigDecimal balance) {
 		out.println("Your balance is " + NumberFormat.getCurrencyInstance().format(balance));
@@ -253,7 +253,7 @@ public class ConsoleService {
 		out.flush();
 	}
 	
-	public void printHello() {
+	public void printHeader() {
 		out.println("*********************");
 		out.println("* Welcome to TEnmo! *");
 		out.println("*********************");

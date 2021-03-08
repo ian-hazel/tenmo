@@ -1,81 +1,137 @@
+// TODO: BUG: REWRITE THIS
 package com.techelevator.tenmo.controller;
 
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.techelevator.tenmo.dao.AccountDAO;
 import com.techelevator.tenmo.dao.TransferDAO;
+import com.techelevator.tenmo.dao.TransferSqlDAO;
 import com.techelevator.tenmo.dao.UserDAO;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.exceptions.AccountNotFoundException;
-import com.techelevator.tenmo.model.exceptions.TransferNotFoundException;
 
 @RestController
+@RequestMapping("/transfers")
 @PreAuthorize("isAuthenticated()")
 public class TransferController {
-
+	
 	private TransferDAO transferDao;
 	private UserDAO userDao;
+	private AccountDAO acctDao;
 	
-	public TransferController(TransferDAO transferDao, UserDAO userDao) {
+	public TransferController(TransferDAO transferDao, UserDAO userDao, AccountDAO acctDao) {
 		this.transferDao = transferDao;
 		this.userDao = userDao;
+		this.acctDao = acctDao;
 	}
 	
-	@RequestMapping(value = "transfers/send", method = RequestMethod.GET)
-	public List<User> findForSend() {
+	@RequestMapping( path = "/send" , method = RequestMethod.POST)
+	public String sendTransfer(@Valid @RequestBody Transfer transfer) {
+		// TODO: finish method
+		String response = "";
+		if (transfer.getUserToId() == transfer.getUserFromId()) {
+			response = "You can't send money to yourself!";
+			return response;
+		}
+		if (acctDao.getBalance(transfer.getUserFromId()).compareTo(transfer.getAmount()) > 0) {
+			acctDao.decreaseBalance(transfer.getUserFromId(), transfer.getAmount());
+			acctDao.increaseBalance(transfer.getUserToId(), transfer.getAmount());
+			int results = transferDao.sendMoney(transfer);
+			if (results == 1) {
+				response = "Transfer Approved";
+			}
+			else {
+				response = "Transfer Failed";
+			}
+		}
+		else {
+			response = "Insufficient Funds";
+		}
+		return response;
+	}
+	
+	@RequestMapping( path = "/request" , method = RequestMethod.POST)
+	public String requestTransfer(@Valid @RequestBody Transfer transfer) {
+		// TODO: finish method
+		String response = "";
+		if (transfer.getUserToId() == transfer.getUserFromId()) {
+			response = "You can't request money from yourself!";
+			return response;
+		}
+		int results = transferDao.requestMoney(transfer);
+		if (results == 1) {
+			response = "Request Sent";
+		}
+		else {
+			response = "Request Failed";
+		}
+		return response;
+	}
+	
+	@RequestMapping( path = "/userlist" , method = RequestMethod.GET)
+	public List<User> getAllUsers() {
 		return userDao.findAll();
 	}
 	
-	@RequestMapping(value = "transfers/request", method = RequestMethod.GET)
-	public List<User> findForRequest() {
-		return userDao.findAll();
-	}
-	
-	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = "transfers/send", method = RequestMethod.POST)
-	public Transfer sendTransfer(Transfer transfer, Principal principal) 
-			throws AccountNotFoundException {
-		try {
-			transferDao.sendMoney(transfer.getAmount(), transfer.getAccountTo(), principal);
-		} catch (AccountNotFoundException e) {
-		}
-	}
-	
-	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(value = "transfers/request", method = RequestMethod.POST)
-	public void requestTransfer(Principal principal) 
-			throws AccountNotFoundException {
-		try {
-			transferDao.getTransferHistory(principal);
-		} catch (AccountNotFoundException e) {
-		}
-	}
-		
-	@RequestMapping(value = "transfers/details", method = RequestMethod.GET)
-	public List<Transfer> getTransferHistory(Principal principal) {
+	@RequestMapping( path = "" , method = RequestMethod.GET)
+	public List<Transfer> getAllTransfers(Principal principal) {
 		return transferDao.getTransferHistory(principal);
 	}
 	
-	@RequestMapping(value = "transfers/details/{id}", method = RequestMethod.GET)
-	public Transfer getTransferDetails(@PathVariable Long transferId, Principal principal) 
-			throws TransferNotFoundException {
-		Transfer transfer = new Transfer();
-		try {
-			transfer = transferDao.getTransferDetails(transferId, principal);
-		} catch (TransferNotFoundException e) {
-		}
-		return transfer;
+	@RequestMapping ( path = "/{id}" , method = RequestMethod.GET)
+	public Transfer getTransferById(@PathVariable long id) {
+		return transferDao.getTransferDetails(id);
 	}
 	
-		
+	@RequestMapping( path = "/userlist/{id}" , method = RequestMethod.GET)
+	public User getUserById(@PathVariable long id) {
+		return userDao.findByUserId(id);
+	}
+	
+	@RequestMapping( path = "/pendingrequests" , method = RequestMethod.GET)
+	public List<Transfer> getPendingRequests(Principal principal) {
+		return transferDao.getPendingRequests(principal);
+	}
+	
+	@RequestMapping( path = "/pendingrequests/{id}/approve" , method = RequestMethod.PUT)
+	public String approveRequest(@Valid @RequestBody Transfer transfer, @PathVariable long id) {
+		String response = "";
+		int updateCheck = 0;
+		if (acctDao.getBalance(transfer.getUserToId()).compareTo(transfer.getAmount()) > 0) {
+			updateCheck = transferDao.approveRequest(transfer);
+			if (updateCheck == 1) {
+				acctDao.decreaseBalance(transfer.getUserToId(), transfer.getAmount());
+				acctDao.increaseBalance(transfer.getUserFromId(), transfer.getAmount());
+				response = "Approval successful, transfer complete";
+			}
+			else {
+				response = "Approval failed";
+			}
+		}
+		else {
+			response = "Insufficient funds to approve request";
+		}
+		return response;
+	}
+	
+	@RequestMapping ( path = "/pendingrequests/{id}/reject", method = RequestMethod.PUT)
+	public String rejectRequest(@Valid @RequestBody Transfer transfer, @PathVariable long id) {
+		String response = "";
+		int updateCheck = 0;
+		updateCheck = transferDao.rejectRequest(transfer);
+		if (updateCheck == 1) {
+			response = "Rejection successful";
+		}
+		else {
+			response = "Rejection failed";
+		}
+		return response;
+	}
 }
