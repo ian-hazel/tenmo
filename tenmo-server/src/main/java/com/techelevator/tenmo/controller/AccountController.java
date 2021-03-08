@@ -26,5 +26,5 @@ public class AccountController {
 		// TODO: update to AuthenticatedUser or pass id or something
 		return accountDao.getBalance(accountDao.getAcctIdFromUserName(principal.getName()));
 	}
-
+	
 }
