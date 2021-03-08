@@ -17,10 +17,14 @@ public class Transfer {
 		REQUEST(1),
 		SEND(2);
 		
-		public final int value;
+		private final int value;
 		
 		private Type(int value) {
 			this.value = value;
+		}
+		
+		public int getValue() {
+			return value;
 		}
 	}
 	
@@ -29,10 +33,14 @@ public class Transfer {
 		APPROVED(2),
 		REJECTED(3);
 		
-		public final int value;
+		private final int value;
 		
 		private Status(int value) {
 			this.value = value;
+		}
+		
+		public int getValue() {
+			return value;
 		}
 	}
 	

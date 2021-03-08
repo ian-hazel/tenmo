@@ -6,6 +6,8 @@ import java.security.Principal;
 public class Transfer {
 
 	private Long transferId;
+	// private Long acctFromId;
+	// private Long acctToId;
 	private Long userFromId;
 	private Long userToId;
 	private BigDecimal amount;
@@ -17,10 +19,14 @@ public class Transfer {
 		REQUEST(1),
 		SEND(2);
 		
-		public final int value;
+		private final int value;
 		
 		private Type(int value) {
 			this.value = value;
+		}
+		
+		public int getValue() {
+			return value;
 		}
 	}
 	
@@ -34,6 +40,10 @@ public class Transfer {
 		private Status(int value) {
 			this.value = value;
 		}
+		
+		public int getValue() {
+			return value;
+		}
 	}
 	
 	public Transfer() {
@@ -46,6 +56,17 @@ public class Transfer {
 		this.status = status;
 	}
 	*/
+	
+	/*
+	public Transfer(Long transferId, Long acctFromId, Long acctToId, BigDecimal amount, Type type, Status status) {
+		this.transferId = transferId;
+		this.acctFromId = acctFromId;
+		this.acctToId = acctToId;
+		this.amount = amount;
+		this.type = type;
+		this.status = status;	
+	}
+	 */
 	
 	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
 		this.transferId = transferId;
@@ -79,7 +100,7 @@ public class Transfer {
 	public void setUserToId(Long userToId) {
 		this.userToId = userToId;
 	}
-
+	
 	public BigDecimal getAmount() {
 		return amount;
 	}
@@ -111,5 +132,21 @@ public class Transfer {
 	public void setPrincipal(Principal principal) {
 		this.principal = principal;
 	}
-	
+/*
+	public Long getAcctFromId() {
+		return acctFromId;
+	}
+
+	public void setAcctFromId(Long acctFromId) {
+		this.acctFromId = acctFromId;
+	}
+
+	public Long getAcctToId() {
+		return acctToId;
+	}
+
+	public void setAcctToId(Long acctToId) {
+		this.acctToId = acctToId;
+	}
+	*/
 }
