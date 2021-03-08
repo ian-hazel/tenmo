@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.exceptions.AccountNotFoundException;
 
 @Component
 public class TransferSqlDAO implements TransferDAO {
@@ -34,6 +35,31 @@ public class TransferSqlDAO implements TransferDAO {
 
 		}
 	}
+	
+	@Override
+	public int sendCash(Transfer transfer) throws AccountNotFoundException {
+		int result = 0;
+		try {
+			result = addTransfer(transfer);
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+	
+    // TODO: BUG: should take a Transfer, not long.
+	public int addTransfer(Transfer transfer) {
+		String sqlAddTransfer = "INSERT INTO transfers (transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount)"
+				+ "VALUES (DEFAULT, ?, ? , ?, ?, ?)";
+		int result = 0;
+		try {
+			result = jdbcTemplate.update(sqlAddTransfer, transfer.getType().getValue(), transfer.getStatus().getValue(), transfer.getUserFromId(), transfer.getUserToId(), transfer.getAmount());
+		}
+		catch (DataAccessException e) {
+		}
+		return result;
+	}
+	
 
 	@Override
     // TODO: BUG: should not return void
@@ -62,8 +88,8 @@ public class TransferSqlDAO implements TransferDAO {
 		List<Transfer> transfers = new ArrayList<>();
 		String sqlGetAllTransfer = "SELECT transfer_id, transfer_type_id, "
 				+ "transfer_status_id, account_from, account_to, amount "
-				+ "FROM transfers  WHERE account_from = ? OR account_to = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllTransfer, Transfer.class, getAccountFromId(principal), getAccountFromId(principal));
+				+ "FROM transfers WHERE account_from = ? OR account_to = ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetAllTransfer, getAccountFromId(principal), getAccountFromId(principal));
 		while(results.next()){
 			Transfer transfer = mapRowToTransfer(results);
 			transfers.add(transfer);
@@ -71,14 +97,14 @@ public class TransferSqlDAO implements TransferDAO {
 		return transfers;
 	}
 
+
 	@Override
-    // TODO: BUG: should take a Transfer, not long. principal is *unused*
-	public Transfer getTransferDetails(Long transferId, Principal principal) {
+	public Transfer getTransferDetails(Long transferId) {
 		Transfer transfer = new Transfer();
 		String sqlGetTransferDetails = "SELECT transfer_id, transfer_type_id, "
 				+ "transfer_status_id, account_from, account_to, amount "
 				+ "FROM transfers WHERE transfer_id = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetTransferDetails, Transfer.class, transferId);
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetTransferDetails, transferId);
 		while(results.next()) {
 			transfer = mapRowToTransfer(results);
 		}
@@ -94,10 +120,11 @@ public class TransferSqlDAO implements TransferDAO {
 			return false;
 		}
 	}
-
-	private String getUsername(Long accountId) {
-		String sqlGetName = "SELECT name FROM accounts WHERE account_id = ?";
-		return jdbcTemplate.queryForObject(sqlGetName, String.class, accountId);
+	
+	
+	public String getUsername(Long userId) {
+		String sqlGetName = "SELECT username FROM users WHERE user_id = ?";
+		return jdbcTemplate.queryForObject(sqlGetName, String.class, userId);
 	}
 
 	private Long getAccountFromId(Principal principal) {
@@ -125,6 +152,13 @@ public class TransferSqlDAO implements TransferDAO {
 	private Transfer mapRowToTransfer(SqlRowSet results) {
 		Transfer transfer = new Transfer();
 		transfer.setTransferId(results.getLong("transfer_id"));
+		transfer.setType(Transfer.Type.valueOfType(results.getInt("transfer_type_id")));
+		transfer.setStatus(Transfer.Status.valueOfStatus(results.getInt("transfer_status_id")));
+		transfer.setUserFromId(results.getLong("account_from"));
+		transfer.setUserToId(results.getLong("account_to"));
+		transfer.setAmount(results.getBigDecimal("amount"));
+		return transfer;
+		/*
 		Long type = results.getLong("transfer_type_id");
 		if(type == 1) {
 			transfer.setType("Request");
@@ -139,41 +173,8 @@ public class TransferSqlDAO implements TransferDAO {
 		} else {
 			transfer.setStatus("Rejected");
 		}
-		transfer.setAccountFrom(getUsername(results.getLong("account_from")));
-		transfer.setAccountTo(getUsername(results.getLong("account_to")));
-		transfer.setAmount(results.getBigDecimal("amount"));
-		return transfer;
+		*/
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	//TODO return to this method
 
 }
