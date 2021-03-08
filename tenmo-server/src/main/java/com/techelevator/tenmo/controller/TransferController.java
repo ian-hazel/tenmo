@@ -104,11 +104,11 @@ public class TransferController {
 	public String approveRequest(@Valid @RequestBody Transfer transfer, @PathVariable long id) {
 		String response = "";
 		int updateCheck = 0;
-		if (acctDao.getBalance(transfer.getUserFromId()).compareTo(transfer.getAmount()) > 0) {
+		if (acctDao.getBalance(transfer.getUserToId()).compareTo(transfer.getAmount()) > 0) {
 			updateCheck = transferDao.approveRequest(transfer);
 			if (updateCheck == 1) {
-				acctDao.decreaseBalance(transfer.getUserFromId(), transfer.getAmount());
-				acctDao.increaseBalance(transfer.getUserToId(), transfer.getAmount());
+				acctDao.decreaseBalance(transfer.getUserToId(), transfer.getAmount());
+				acctDao.increaseBalance(transfer.getUserFromId(), transfer.getAmount());
 				response = "Approval successful, transfer complete";
 			}
 			else {
