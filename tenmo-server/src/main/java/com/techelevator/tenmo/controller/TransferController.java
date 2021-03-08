@@ -1,6 +1,7 @@
 // TODO: BUG: REWRITE THIS
 package com.techelevator.tenmo.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -31,26 +32,29 @@ public class TransferController {
 		this.acctDao = acctDao;
 	}
 	
-	
-	
 	@RequestMapping( path = "/send" , method = RequestMethod.POST)
 	public String sendTransfer(@Valid @RequestBody Transfer transfer) {
 		// TODO: finish method
 		String response = "";
-		if (transfer.getUserToId() != transfer.getUserFromId()) {
-			//accountDao.decreaseBalance(transfer.getSendingAccount, transfer.getAmount);
-			//accountDao.increaseBalance(transfer.getReceivingAccount, transfer.getAmount);
-			// int results = transferDao.createTransfer(transfer);
-			// if (results == 1) {
-			// 		response = "Transfer Approved";
-			// }
-			// else {
-			// 		response = "Transfer Failed";
-			// }
-			// return response;
+		if (transfer.getUserToId() == transfer.getUserFromId()) {
+			response = "You can't send money to yourself!";
+			return response;
 		}
-		
-		return null;
+		if (acctDao.getBalance(transfer.getUserFromId()).compareTo(transfer.getAmount()) > 0) {
+			acctDao.decreaseBalance(transfer.getUserFromId(), transfer.getAmount());
+			acctDao.increaseBalance(transfer.getUserToId(), transfer.getAmount());
+			int results = transferDao.sendCash(transfer);
+			if (results == 1) {
+				response = "Transfer Approved";
+			}
+			else {
+				response = "Transfer Failed";
+			}
+		}
+		else {
+			response = "Insufficient Funds";
+		}
+		return response;
 	}
 	
 	@RequestMapping( path = "/userlist" , method = RequestMethod.GET)
@@ -58,10 +62,19 @@ public class TransferController {
 		return userDao.findAll();
 	}
 	
+	@RequestMapping( path = "" , method = RequestMethod.GET)
+	public List<Transfer> getAllTransfers(Principal principal) {
+		return transferDao.getTransferHistory(principal);
+	}
 	
+	@RequestMapping ( path = "/{id}" , method = RequestMethod.GET)
+	public Transfer getTransferById(@PathVariable long id) {
+		return transferDao.getTransferDetails(id);
+	}
 	
-	
-	
-	
+	@RequestMapping( path = "/userlist/{id}" , method = RequestMethod.GET)
+	public User getUserById(@PathVariable long id) {
+		return userDao.findByUserId(id);
+	}
 	
 }
