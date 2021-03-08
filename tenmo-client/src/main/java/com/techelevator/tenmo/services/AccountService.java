@@ -30,7 +30,7 @@ public class AccountService {
 		BigDecimal balance = null;
 		try {
         	balance = restTemplate
-                    .exchange(BASE_URL + "/balance" + "/" + user.getUser().getId(), HttpMethod.GET, makeAuthEntity(user.getToken()), BigDecimal.class).getBody();
+                    .exchange(BASE_URL + "/balance", HttpMethod.GET, makeAuthEntity(user.getToken()), BigDecimal.class).getBody();
         } catch (RestClientResponseException ex) {
             System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
         }
