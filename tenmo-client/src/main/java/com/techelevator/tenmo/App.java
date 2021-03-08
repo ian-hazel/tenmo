@@ -1,7 +1,6 @@
 package com.techelevator.tenmo;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.text.NumberFormat;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
@@ -35,7 +34,6 @@ private static final String API_BASE_URL = "http://localhost:8080";
     private AuthenticationService authenticationService;
 	private AccountService accountService;
 	private TransferService transferService;
-	private Principal principal;
 
     public static void main(String[] args) {
     	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), new AccountService(API_BASE_URL), new TransferService(API_BASE_URL));
