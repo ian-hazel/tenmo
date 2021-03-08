@@ -37,9 +37,9 @@ public class TransferService {
 	 * @param user, amount, receivingAcct
 	 * @return new sent transfer
 	 */
-	public Transfer sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user, Principal principal) {
+	public Transfer sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
 		
-		Transfer toSend = makeBasicTransfer(amount, userToId, principal);
+		Transfer toSend = makeBasicTransfer(amount, userToId, user);
 		toSend.setType(Transfer.Type.SEND);
 		toSend.setStatus(Transfer.Status.APPROVED);
 		
@@ -78,9 +78,9 @@ public class TransferService {
 	 * @param user, amount, requestedAcct
 	 * @return new requested transfer
 	 */
-	public Transfer requestTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user, Principal principal) {
+	public Transfer requestTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
 		
-		Transfer toSend = makeBasicTransfer(amount, userToId, principal);
+		Transfer toSend = makeBasicTransfer(amount, userToId, user);
 		toSend.setType(Transfer.Type.REQUEST);
 		toSend.setStatus(Transfer.Status.PENDING);
 		
@@ -101,7 +101,7 @@ public class TransferService {
 		//requestTransfer.setStatus(Transfer.Status.PENDING);
 	}
 	
-	public Transfer[] getTransferHistory(Principal principal, AuthenticatedUser user) {
+	public Transfer[] getTransferHistory(AuthenticatedUser user) {
 		Transfer[] transferHistory = null;
 		String url = BASE_URL + "transfers/";
 		
@@ -114,7 +114,7 @@ public class TransferService {
 		return transferHistory;
 	}
 	
-	public Transfer getTransferDetails(Principal principal, AuthenticatedUser user, Long transferId) {
+	public Transfer getTransferDetails(AuthenticatedUser user, Long transferId) {
 		Transfer thisTransfer = null;
 		String url = BASE_URL + "transfers/" + transferId;
 		
@@ -133,6 +133,8 @@ public class TransferService {
 	 * @return pendingRequests
 	 */
 	public Request[] getPendingRequests(AuthenticatedUser user) {
+		// TODO update to Transfers
+		
 		Request[] pendingRequests = null;
 		
 		try {
@@ -170,12 +172,11 @@ public class TransferService {
 	}
 	
 	
-	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, Principal principal) {
-		// takes in amount, userToId, principal
+	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
 		Transfer newTransfer = new Transfer();
 		newTransfer.setAmount(amount);
 		newTransfer.setUserToId(userToId);
-		newTransfer.setPrincipal(principal);
+		newTransfer.setUserFromId((long)user.getUser().getId());
 		
 		return newTransfer;
 	}
