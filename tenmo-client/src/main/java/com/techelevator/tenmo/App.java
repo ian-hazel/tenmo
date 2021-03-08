@@ -93,12 +93,44 @@ private static final String API_BASE_URL = "http://localhost:8080";
 		System.out.println("---------------------------------------------");
 		Transfer[] transfers = transferService.getTransferHistory(currentUser);
 		for (Transfer transfer : transfers) {
+			if (transfer.getUserFromId() == (long)currentUser.getUser().getId()) {
+				System.out.println(transfer.getTransferId() + "          "
+								+ "To:  " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername()
+								+ "                 " + transfer.getAmount());				
+			}
+			else {
+				System.out.println(transfer.getTransferId() + "          "
+								+ "From:  " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername()
+								+ "                 " + transfer.getAmount());
+			}
 		// TODO: get print line working, needs from/to definition and the transfer name
 			//	System.out.println(transfer.getTransferId() + "        " + transfer.getType()) + transfer.get "                   " + NumberFormat.getCurrencyInstance().format(transfer.getAmount());
+		}
+		System.out.println("---------");
+		Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
+		if (transferId != 0) {
+			// TODO: run the transfer detail method
+			System.out.println("---------------------------------------------");
+			System.out.println("Transfer Details");
+			System.out.println("---------------------------------------------");
+			Transfer transfer = transferService.getTransferDetails(currentUser, transferId);
+			System.out.println("Id: " + transfer.getTransferId());
+			System.out.println("From: " + transferService.getUserById(transfer.getUserFromId(),currentUser).getUsername());
+			System.out.println("To: " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername());
+			System.out.println("Type: " + transfer.getType().toString());
+			System.out.println("Status: " + transfer.getStatus().toString());
+			System.out.println("Amount: " + NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
 		}
 	}
 	
 	// TODO: implement viewTransferDetails -- USE CASE 6 in readme
+	private void viewTransferDetails() {
+		System.out.println("---------------------------------------------");
+		System.out.println("Transfer Details");
+		System.out.println("---------------------------------------------");
+		Long transferId = null;
+		Transfer transfer = transferService.getTransferDetails(currentUser, transferId);
+	}
 
 	private void viewPendingRequests() {
 		//TODO: move formatting/display header to console service/make pretty
@@ -134,9 +166,12 @@ private static final String API_BASE_URL = "http://localhost:8080";
 		System.out.println("----------");
 		System.out.println();
 		Long userToId = (long)console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel):");
-		BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
-		
-		transferService.sendTransfer(amount, userToId, currentUser, principal);
+		if (userToId != 0) {
+			BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
+			
+			String outcome = transferService.sendTransfer(amount, userToId, currentUser);
+			System.out.println(outcome);			
+		}
 	}
 
 	private void requestBucks() {
@@ -155,7 +190,7 @@ private static final String API_BASE_URL = "http://localhost:8080";
 		Long userToId = (long)console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel):");
 		BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
 		
-		transferService.requestTransfer(amount, userToId, currentUser, principal);
+		transferService.requestTransfer(amount, userToId, currentUser);
 	}
 	
 	private void exitProgram() {
