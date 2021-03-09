@@ -2,6 +2,8 @@ package com.techelevator.tenmo;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
@@ -80,133 +82,85 @@ private static final String API_BASE_URL = "http://localhost:8080";
 	}
 
 	private void viewTransferHistory() {
-		// TODO: move some to console service to streamline
-		System.out.println("---------------------------------------------");
-		System.out.println("Transfers                                    ");
-		System.out.println("ID            From/To                  Amount");
-		System.out.println("---------------------------------------------");
+		List<Transfer> transferList = new ArrayList<>();
 		Transfer[] transfers = transferService.getTransferHistory(currentUser);
 		for (Transfer transfer : transfers) {
 			if (transfer.getUserFromId() == (long)currentUser.getUser().getId()) {
-				System.out.println(transfer.getTransferId() + "          "
-								+ "To:  " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername()
-								+ "                 " + transfer.getAmount());				
+				transfer.setUsername("  To: " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername());
+			} else {
+				transfer.setUsername("From: " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername());
 			}
-			else {
-				System.out.println(transfer.getTransferId() + "          "
-								+ "From:  " + transferService.getUserById(transfer.getUserFromId(),currentUser).getUsername()
-								+ "                 " + transfer.getAmount());
-			}
+			transferList.add(transfer);
 		}
-		System.out.println("---------");
-		Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel)");
+		Long transferId = console.printTransferHistory(transferList);
 		if (transferId != 0) {
-			System.out.println("---------------------------------------------");
-			System.out.println("Transfer Details");
-			System.out.println("---------------------------------------------");
-			Transfer transfer = transferService.getTransferDetails(currentUser, transferId);
-			System.out.println("Id: " + transfer.getTransferId());
-			System.out.println("From: " + transferService.getUserById(transfer.getUserFromId(),currentUser).getUsername());
-			System.out.println("To: " + transferService.getUserById(transfer.getUserToId(),currentUser).getUsername());
-			System.out.println("Type: " + transfer.getType().toString());
-			System.out.println("Status: " + transfer.getStatus().toString());
-			System.out.println("Amount: " + NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
+			viewTransferDetails(transferId);
 		}
 	}
-	
-	// STUB could be implemented into above method
-	private void viewTransferDetails() {
-		System.out.println("---------------------------------------------");
-		System.out.println("Transfer Details");
-		System.out.println("---------------------------------------------");
-		Long transferId = null;
+
+	private void viewTransferDetails(Long transferId) {
 		Transfer transfer = transferService.getTransferDetails(currentUser, transferId);
+		String fromName = transferService.getUserById(transfer.getUserFromId(),currentUser).getUsername();
+		String toName = transferService.getUserById(transfer.getUserToId(),currentUser).getUsername();
+		console.transferDetails(transfer, fromName, toName);
+		
 	}
 
 	private void viewPendingRequests() {
-		//TODO: move formatting/display header to console service/make pretty
+		List<Transfer> requestList = new ArrayList<>();
 		Transfer[] pendingRequests = transferService.getPendingRequests(currentUser);
-		if (pendingRequests.length != 0) {
-			System.out.println("---------------------------------------------");
-			System.out.println("Pending Transfer                             ");
-			System.out.println("ID          To                   Amount      ");
-			System.out.println("---------------------------------------------");
-			
-			for (Transfer pending : pendingRequests) {
-				System.out.println(pending.getTransferId() + "           " + transferService.getUserById(pending.getUserFromId(),currentUser).getUsername() + "           " + pending.getAmount());
+		if (pendingRequests != null) {
+			for(Transfer pending : pendingRequests) {
+				Transfer transfer = new Transfer();
+				transfer.setTransferId(pending.getTransferId());
+				transfer.setUsername(transferService.getUserById(pending.getUserFromId(),currentUser).getUsername());
+				transfer.setAmount(pending.getAmount());
+				requestList.add(transfer);
 			}
-			System.out.println("----------");
-			Long transferId = (long)console.getUserInputInteger("Please enter transfer ID to approve/reject (0 to cancel):");
-			
+			Long transferId = console.requestsMenu(requestList);
 			if (transferId != 0) {
 				approveOrRejectRequest(transferId);		
 			}
 		}
-		else {
-			System.out.println("No pending requests!");
-		}
 	}
 	
 	private void approveOrRejectRequest(Long transferId) {
-		System.out.println("1: Approve");
-		System.out.println("2: Reject");
-		System.out.println("0: Don't approve or reject");
-		System.out.println("----------");
-		int userSelection = console.getUserInputInteger("Please choose an option:");
-		// TODO: if user chooses an option beyond 1, 2, 0 will program crash?
-		if (userSelection == 1) {
-			// TODO: needs to update request to approved and try to transfer funds
-			String outcome = transferService.approveRequest(transferService.getTransferDetails(currentUser, transferId), currentUser);
-			System.out.println(outcome);
-		}
-		else if (userSelection == 2) {
-			String outcome = transferService.rejectRequest(transferService.getTransferDetails(currentUser, transferId), currentUser);
-			System.out.println(outcome);
-		}
-		else if (userSelection != 0) {
-			System.out.println("Invalid input!");
+		Integer choice = console.appendRequests();
+		if (choice == 1) {
+			console.response(transferService.approveRequest(transferService.getTransferDetails(currentUser, transferId), currentUser));
+		} else if (choice == 2) {
+			console.response(transferService.rejectRequest(transferService.getTransferDetails(currentUser, transferId), currentUser));
 		}
 	}
 
 	private void sendBucks() {
-//		TODO: move formatting/display header to console service/make pretty
-		System.out.println("---------------------------------------------");
-		System.out.println("Users                                        ");
-		System.out.println("ID               Name                        ");
-		System.out.println("---------------------------------------------");
-		
+		List<User> userList = new ArrayList<>();
 		User[] allUsers = transferService.getAllUsers(currentUser);
 		for (User user : allUsers) {
-			System.out.println(user.getId() + "           " + user.getUsername() + "           ");
+			if(currentUser.getUser().getId() != user.getId()) {
+				userList.add(user);
+			}
 		}
-		System.out.println("----------");
-		System.out.println();
-		Long userToId = (long)console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel):");
+		Long userToId = console.sendTransfer(userList);
 		if (userToId != 0) {
-			BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
-			
-			String outcome = transferService.sendTransfer(amount, userToId, currentUser);
-			System.out.println(outcome);			
+			BigDecimal amount = console.getTransferAmount();	
+			console.response(transferService.sendTransfer(amount, userToId, currentUser));			
 		}
 	}
 
 	private void requestBucks() {
-//		TODO: move formatting/display header to console service/make pretty
-		System.out.println("---------------------------------------------");
-		System.out.println("Users                                        ");
-		System.out.println("ID               Name                        ");
-		System.out.println("---------------------------------------------");
-		
+		List<User> userList = new ArrayList<>();
 		User[] allUsers = transferService.getAllUsers(currentUser);
 		for (User user : allUsers) {
-			System.out.println(user.getId() + "           " + user.getUsername() + "           ");
+			if(currentUser.getUser().getId() != user.getId()) {
+				userList.add(user);
+			}
 		}
-		System.out.println("----------");
-		System.out.println();
-		Long userToId = (long)console.getUserInputInteger("Enter ID of user you are requesting from (0 to cancel):");
-		BigDecimal amount = BigDecimal.valueOf(console.getUserInputInteger("Enter amount:"));
-		
-		transferService.requestTransfer(amount, userToId, currentUser);
+		Long userToId = console.requestTransfer(userList);
+		if (userToId != 0) {
+			BigDecimal amount = console.getTransferAmount();	
+			console.response(transferService.requestTransfer(amount, userToId, currentUser));			
+		}
 	}
 	
 	private void exitProgram() {
@@ -233,7 +187,7 @@ private static final String API_BASE_URL = "http://localhost:8080";
 	}
 
 	private void register() {
-		System.out.println("Please register a new user account");
+		console.message("Please register a new user account");
 		boolean isRegistered = false;
         while (!isRegistered) //will keep looping until user is registered
         {
@@ -241,16 +195,16 @@ private static final String API_BASE_URL = "http://localhost:8080";
             try {
             	authenticationService.register(credentials);
             	isRegistered = true;
-            	System.out.println("Registration successful. You can now login.");
+            	console.message("Registration successful. You can now login.");
             } catch(AuthenticationServiceException e) {
-            	System.out.println("REGISTRATION ERROR: "+e.getMessage());
-				System.out.println("Please attempt to register again.");
+            	console.message("REGISTRATION ERROR: "+e.getMessage());
+            	console.message("Please attempt to register again.");
             }
         }
 	}
 
 	private void login() {
-		System.out.println("Please log in");
+		console.message("Please log in");
 		currentUser = null;
 		while (currentUser == null) //will keep looping until user is logged in
 		{
@@ -258,8 +212,8 @@ private static final String API_BASE_URL = "http://localhost:8080";
 		    try {
 				currentUser = authenticationService.login(credentials);
 			} catch (AuthenticationServiceException e) {
-				System.out.println("LOGIN ERROR: "+e.getMessage());
-				System.out.println("Please attempt to login again.");
+				console.message("LOGIN ERROR: "+e.getMessage());
+				console.message("Please attempt to login again.");
 			}
 		}
 	}
