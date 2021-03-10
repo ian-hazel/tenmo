@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +32,6 @@ public class TransferController {
 	
 	@RequestMapping( path = "/send" , method = RequestMethod.POST)
 	public String sendTransfer(@Valid @RequestBody Transfer transfer) {
-		// TODO: finish method
 		String response = "";
 		if (transfer.getUserToId() == transfer.getUserFromId()) {
 			response = "You can't send money to yourself!";
@@ -45,12 +43,10 @@ public class TransferController {
 			int results = transferDao.sendMoney(transfer);
 			if (results == 1) {
 				response = "Transfer Approved";
-			}
-			else {
+			} else {
 				response = "Transfer Failed";
 			}
-		}
-		else {
+		} else {
 			response = "Insufficient Funds";
 		}
 		return response;
@@ -58,7 +54,6 @@ public class TransferController {
 	
 	@RequestMapping( path = "/request" , method = RequestMethod.POST)
 	public String requestTransfer(@Valid @RequestBody Transfer transfer) {
-		// TODO: finish method
 		String response = "";
 		if (transfer.getUserToId() == transfer.getUserFromId()) {
 			response = "You can't request money from yourself!";
@@ -67,8 +62,7 @@ public class TransferController {
 		int results = transferDao.requestMoney(transfer);
 		if (results == 1) {
 			response = "Request Sent";
-		}
-		else {
+		} else {
 			response = "Request Failed";
 		}
 		return response;
@@ -109,12 +103,10 @@ public class TransferController {
 				acctDao.decreaseBalance(transfer.getUserToId(), transfer.getAmount());
 				acctDao.increaseBalance(transfer.getUserFromId(), transfer.getAmount());
 				response = "Approval successful, transfer complete";
-			}
-			else {
+			} else {
 				response = "Approval failed";
 			}
-		}
-		else {
+		} else {
 			response = "Insufficient funds to approve request";
 		}
 		return response;
@@ -127,8 +119,7 @@ public class TransferController {
 		updateCheck = transferDao.rejectRequest(transfer);
 		if (updateCheck == 1) {
 			response = "Rejection successful";
-		}
-		else {
+		} else {
 			response = "Rejection failed";
 		}
 		return response;
