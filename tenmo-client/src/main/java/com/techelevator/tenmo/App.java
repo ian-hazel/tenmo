@@ -78,7 +78,7 @@ private static final String API_BASE_URL = "http://localhost:8080";
 	}
 
 	private void viewCurrentBalance() {
-		console.message(NumberFormat.getCurrencyInstance().format(accountService.getBalance(currentUser)));	
+		console.printBalance(accountService.getBalance(currentUser));
 	}
 
 	private void viewTransferHistory() {
