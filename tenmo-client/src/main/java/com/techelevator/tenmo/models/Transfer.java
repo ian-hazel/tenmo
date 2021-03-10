@@ -1,17 +1,16 @@
 package com.techelevator.tenmo.models;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 
 public class Transfer {
 
 	private Long transferId;
+	private String username;
 	private Long userFromId;
 	private Long userToId;
 	private BigDecimal amount;
 	private Type type;
 	private Status status;
-	private Principal principal;
 	
 	public enum Type {
 		REQUEST(1),
@@ -64,6 +63,12 @@ public class Transfer {
 	
 	public Transfer() {
 		
+	}
+	
+	public Transfer(Long transferId, String username, BigDecimal amount) {
+		this.transferId = transferId;
+		this.username = username;
+		this.amount = amount;
 	}
 	
 	public Transfer(Long transferId, Long userFromId, Long userToId, BigDecimal amount, Type type, Status status) {
@@ -123,12 +128,12 @@ public class Transfer {
 		this.status = status;
 	}
 
-	public Principal getPrincipal() {
-		return principal;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setPrincipal(Principal principal) {
-		this.principal = principal;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 }

@@ -178,55 +178,6 @@ public class TransferService {
 		}
 		return outcome;	
 	}
-	/*
-	public String sendTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
-		
-		Transfer toSend = makeBasicTransfer(amount, userToId, user);
-		toSend.setType(Transfer.Type.SEND);
-		toSend.setStatus(Transfer.Status.APPROVED);
-		
-		String url = BASE_URL + "/transfers/send";
-		String status = null;
-		
-		try {
-			status = restTemplate.postForObject(url, makeTransferEntity(toSend, user.getToken()), String.class);
-		}
-		catch (RestClientResponseException e) {
-			System.out.println((e.getRawStatusCode() + " : " + e.getResponseBodyAsString()));
-		}
-		
-		return status;
-	}
-	*/ // TODO: remove this after approveRequest complete, only as example
-	
-	/**
-	 * Checks list of pending requests from database
-	 * @param user
-	 * @return pendingRequests
-	 */
-	/*
-	public Integer approveOrRejectRequest(Request request, int userChoice, AuthenticatedUser user, Principal principal) {
-		if (userChoice != 1 || userChoice != 2) {
-			return null;
-		}
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setBearerAuth(user.getToken());
-		HttpEntity<Integer> entity = new HttpEntity<>(userChoice, headers);
-		
-		String url = BASE_URL + "requests?append=" + request.getTransferId();		
-		
-		try {
-			restTemplate.put(url, entity);
-		}
-		catch (RestClientResponseException ex) {
-            System.out.println((ex.getRawStatusCode() + " : " + ex.getResponseBodyAsString()));
-		}
-		return userChoice;
-	}
-	*/
-	
 	
 	private Transfer makeBasicTransfer(BigDecimal amount, Long userToId, AuthenticatedUser user) {
 		Transfer newTransfer = new Transfer();
