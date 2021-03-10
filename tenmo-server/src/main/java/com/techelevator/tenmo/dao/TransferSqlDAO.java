@@ -27,8 +27,7 @@ public class TransferSqlDAO implements TransferDAO {
 		int result = 0;
 		try {
 			result = addTransfer(transfer);
-		}
-		catch (DataAccessException e) {
+		} catch (DataAccessException e) {
 		}
 		return result;
 	}
@@ -38,8 +37,7 @@ public class TransferSqlDAO implements TransferDAO {
 		int result = 0;
 		try {
 			result = addTransfer(transfer);
-		}
-		catch (DataAccessException e) {
+		} catch (DataAccessException e) {
 		}
 		return result;
 	}
@@ -50,8 +48,7 @@ public class TransferSqlDAO implements TransferDAO {
 		int result = 0;
 		try {
 			result = jdbcTemplate.update(sqlAddTransfer, transfer.getType().getValue(), transfer.getStatus().getValue(), transfer.getUserFromId(), transfer.getUserToId(), transfer.getAmount());
-		}
-		catch (DataAccessException e) {
+		} catch (DataAccessException e) {
 		}
 		return result;
 	}
