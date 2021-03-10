@@ -120,31 +120,31 @@ public class ConsoleServiceTest {
 		Assert.assertEquals(expected, result);
 	}
 	
-	@Test
-	public void displays_prompt_for_user_input_integer() {
-		ConsoleService console = getServiceForTesting();
-		String prompt = "Your Age";
-		String expected = "Your Age: ";
-		console.getUserInputInteger(prompt);
-		Assert.assertEquals(expected, output.toString());
-	}
-	
-	@Test
-	public void returns_user_input_for_integer() {
-		Integer expected = 27;
-		ConsoleService console = getServiceForTestingWithUserInput(expected.toString());
-		Integer result = console.getUserInputInteger("Enter a number");
-		Assert.assertEquals(expected, result);
-	}
-	
-	@Test
-	public void shows_error_and_redisplays_prompt_if_user_enters_invalid_integer() {
-		ConsoleService console = getServiceForTestingWithUserInput("bogus" + System.lineSeparator() + "1" + System.lineSeparator());
-		String prompt = "Your Age";
-		String expected = "Your Age: " + System.lineSeparator() + "*** bogus is not valid ***" + System.lineSeparator() + System.lineSeparator() + "Your Age: ";
-		console.getUserInputInteger(prompt);
-		Assert.assertEquals(expected, output.toString());
-	}
+//	@Test
+//	public void displays_prompt_for_user_input_integer() {
+//		ConsoleService console = getServiceForTesting();
+//		String prompt = "Your Age";
+//		String expected = "Your Age: ";
+//		console.getUserInputInteger(prompt);
+//		Assert.assertEquals(expected, output.toString());
+//	}
+//	
+//	@Test
+//	public void returns_user_input_for_integer() {
+//		Integer expected = 27;
+//		ConsoleService console = getServiceForTestingWithUserInput(expected.toString());
+//		Integer result = console.getUserInputInteger("Enter a number");
+//		Assert.assertEquals(expected, result);
+//	}
+//	
+//	@Test
+//	public void shows_error_and_redisplays_prompt_if_user_enters_invalid_integer() {
+//		ConsoleService console = getServiceForTestingWithUserInput("bogus" + System.lineSeparator() + "1" + System.lineSeparator());
+//		String prompt = "Your Age";
+//		String expected = "Your Age: " + System.lineSeparator() + "*** bogus is not valid ***" + System.lineSeparator() + System.lineSeparator() + "Your Age: ";
+//		console.getUserInputInteger(prompt);
+//		Assert.assertEquals(expected, output.toString());
+//	}
 
 	private ConsoleService getServiceForTestingWithUserInput(String userInput) {
 		ByteArrayInputStream input = new ByteArrayInputStream(String.valueOf(userInput).getBytes());

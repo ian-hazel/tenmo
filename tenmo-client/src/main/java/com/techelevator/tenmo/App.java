@@ -1,7 +1,6 @@
 package com.techelevator.tenmo;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +77,7 @@ private static final String API_BASE_URL = "http://localhost:8080";
 	}
 
 	private void viewCurrentBalance() {
-		console.message(NumberFormat.getCurrencyInstance().format(accountService.getBalance(currentUser)));	
+		console.printBalance(accountService.getBalance(currentUser));	
 	}
 
 	private void viewTransferHistory() {
@@ -92,14 +91,14 @@ private static final String API_BASE_URL = "http://localhost:8080";
 			}
 			transferList.add(transfer);
 		}
-		Long transferId = console.printTransferHistory(transferList);
+		Integer transferId = console.printTransferHistory(transferList);
 		if (transferId != 0) {
 			viewTransferDetails(transferId);
 		}
 	}
 
-	private void viewTransferDetails(Long transferId) {
-		Transfer transfer = transferService.getTransferDetails(currentUser, transferId);
+	private void viewTransferDetails(Integer transferId) {
+		Transfer transfer = transferService.getTransferDetails(currentUser, Long.valueOf(transferId));
 		String fromName = transferService.getUserById(transfer.getUserFromId(),currentUser).getUsername();
 		String toName = transferService.getUserById(transfer.getUserToId(),currentUser).getUsername();
 		console.transferDetails(transfer, fromName, toName);
@@ -117,9 +116,9 @@ private static final String API_BASE_URL = "http://localhost:8080";
 				transfer.setAmount(pending.getAmount());
 				requestList.add(transfer);
 			}
-			Long transferId = console.requestsMenu(requestList);
+			Integer transferId = console.requestsMenu(requestList);
 			if (transferId != 0) {
-				approveOrRejectRequest(transferId);		
+				approveOrRejectRequest(Long.valueOf(transferId));		
 			}
 		}
 	}
@@ -141,10 +140,10 @@ private static final String API_BASE_URL = "http://localhost:8080";
 				userList.add(user);
 			}
 		}
-		Long userToId = console.sendTransfer(userList);
+		Integer userToId = console.sendTransfer(userList);
 		if (userToId != 0) {
 			BigDecimal amount = console.getTransferAmount();	
-			console.response(transferService.sendTransfer(amount, userToId, currentUser));			
+			console.response(transferService.sendTransfer(amount, Long.valueOf(userToId), currentUser));			
 		}
 	}
 
@@ -156,10 +155,10 @@ private static final String API_BASE_URL = "http://localhost:8080";
 				userList.add(user);
 			}
 		}
-		Long userToId = console.requestTransfer(userList);
+		Integer userToId = console.requestTransfer(userList);
 		if (userToId != 0) {
 			BigDecimal amount = console.getTransferAmount();	
-			console.response(transferService.requestTransfer(amount, userToId, currentUser));			
+			console.response(transferService.requestTransfer(amount, Long.valueOf(userToId), currentUser));			
 		}
 	}
 	
